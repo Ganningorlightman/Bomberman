@@ -1,4 +1,4 @@
-﻿<Properties StartupItem="Roll a Ball.csproj">
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerController.cs">
     <Files>
