@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectCreator : MonoBehaviour {
+public class ObjectCreator {
 
     public GameObject gObject;
     public Vector3 position;
@@ -21,6 +21,6 @@ public class ObjectCreator : MonoBehaviour {
     {
         this.position = position;
         gObject.transform.position = position;
-        Instantiate(gObject);
+        //Instantiate(gObject);
     }
 }

@@ -75,13 +75,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\BaseClasses\GameFieldBase.cs" />
-    <Compile Include="Assets\Scripts\BaseClasses\StaticObjectGeneratorBase.cs" />
-    <Compile Include="Assets\Scripts\Common\GameInitializer.cs" />
-    <Compile Include="Assets\Scripts\Common\ObjectCreator.cs" />
-    <Compile Include="Assets\Scripts\Common\StaticObjectGenerator.cs" />
-    <Compile Include="Assets\Scripts\GameField.cs" />
-    <Compile Include="Assets\Scripts\GameMeneger.cs" />
+    <Compile Include="Assets\Scripts\BaseObject.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Bomb.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Character.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Character\Enemie.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Character\Player.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Item.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Item\Bonus.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Item\Powerup.cs" />
+    <Compile Include="Assets\Scripts\Destructible\Obstacle.cs" />
+    <Compile Include="Assets\Scripts\Exit.cs" />
+    <Compile Include="Assets\Scripts\GameInitializer.cs" />
+    <Compile Include="Assets\Scripts\PlayerController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
