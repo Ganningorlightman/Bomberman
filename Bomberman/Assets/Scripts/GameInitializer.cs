@@ -8,6 +8,9 @@ public class GameInitializer : MonoBehaviour {
     //public ObjectCreator floor;
     public GameObject walls;  
     public GameObject player;
+    public GameObject enemy1;
+    public GameObject enemy2;
+
 
     void Start ()
     {
@@ -51,6 +54,16 @@ public class GameInitializer : MonoBehaviour {
         player.transform.position = new Vector3(-5f, 0, 5f);
         player.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
         Instantiate(player);
+
+        enemy1 = (Resources.Load("Models/Enemy1", typeof(GameObject))) as GameObject;
+        enemy1.transform.position = new Vector3(-15f, 0, 15f);
+        enemy1.transform.localScale = new Vector3(5f, 5f, 5f);
+        Instantiate(enemy1);
+
+        enemy2 = (Resources.Load("Models/Enemy2", typeof(GameObject))) as GameObject;
+        enemy2.transform.position = new Vector3(-45f, 0, 45f);
+        enemy2.transform.localScale = new Vector3(5f, 5f, 5f);
+        Instantiate(enemy2);
     }
     void Update ()
     {
