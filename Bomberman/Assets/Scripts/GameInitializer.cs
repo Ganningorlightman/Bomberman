@@ -32,7 +32,7 @@ public class GameInitializer : MonoBehaviour {
             Instantiate(walls);
         }
 
-        for (int i = 0; i < 13 * 5; i += 5)
+        for (int i = 5; i < 12 * 5; i += 5)
         {
             walls.transform.position = new Vector3(-i, 0, 0);
             Instantiate(walls);

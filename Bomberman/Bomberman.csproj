@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\Destructible\Item\Bonus.cs" />
     <Compile Include="Assets\Scripts\Destructible\Item\Powerup.cs" />
     <Compile Include="Assets\Scripts\Destructible\Obstacle.cs" />
+    <Compile Include="Assets\Scripts\EnemyController.cs" />
     <Compile Include="Assets\Scripts\Exit.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
