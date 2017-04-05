@@ -8,13 +8,13 @@ public class Bomb : MonoBehaviour {
 
     void Start()
     {
-        //explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
+        explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
         Invoke("Explode", 3f);
     }
 
     void Update()
     {
-
+       
     }
 
     void Explode()
@@ -26,28 +26,29 @@ public class Bomb : MonoBehaviour {
         StartCoroutine(CreateExplosion(Vector3.left));
         GetComponent<MeshRenderer>().enabled = false;
         transform.FindChild("Collider").gameObject.SetActive(false);
-        Destroy(gameObject, 3f);
+        //Destroy(gameObject, 3f);
     }
     private IEnumerator CreateExplosion(Vector3 direction)
     {
-
         for (int i = 1; i < 3; i++)
         {
             RaycastHit hit;
-
             Physics.Raycast(transform.position + new Vector3(0, .5f, 0), direction, out hit, i, 8);
 
-            if (!hit.collider)
-            {
-                Instantiate(explosion, transform.position + (i * direction),
-                  explosion.transform.rotation);
-            }
-            else
-            {
+            if (!hit.collider)           
+                Instantiate(explosion, transform.position + (i * direction), explosion.transform.rotation);       
+            else            
                 break;
-            }
-
+            
             yield return new WaitForSeconds(.05f);
+        }
+    }
+
+    public void OnTriggerEnter(Collider col)
+    {
+        if (col.CompareTag("Explosion"))
+        {
+            Destroy(gameObject);
         }
     }
 }

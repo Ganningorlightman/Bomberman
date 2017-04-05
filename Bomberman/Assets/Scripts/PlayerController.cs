@@ -29,12 +29,13 @@ public class PlayerController : MonoBehaviour {
 
     private void UpdatePlayerMovement()
     {
+        RaycastHit hit;
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-        { //В верх           
+        { //В верх          
             myTransform.rotation = new Quaternion(0, 0, 0, 0);
             target = new Vector3(myTransform.position.x, myTransform.position.y, myTransform.position.z + 1.5f);
-            if (!Physics.Linecast(myTransform.position, target))
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;          
+            if (!Physics.CapsuleCast(new Vector3(myTransform.position.x, myTransform.position.y - 1.25f, myTransform.position.z), new Vector3(myTransform.position.x, myTransform.position.y + 1.25f, myTransform.position.z), 2.5f, transform.forward, out hit, 0.1f))
+                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         { //В низ    

@@ -10,6 +10,7 @@ public class Explosion : MonoBehaviour {
 	}
 	
 	void Update () {
-		
+        Destroy(gameObject, 1f);
 	}
+
 }

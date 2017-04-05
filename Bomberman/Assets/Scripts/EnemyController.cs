@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
     	
-	public float speed = 5;
+	public float speed = 5f;
     private Vector3 target;
-    private float myTime = 1;
+    private float myTime = 1f;
     private int direc;
 
     void Start()
@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour {
         if (myTime <= 0)
         {
             direc = Random.Range(1, 5);
-            myTime = 1;          
+            myTime = 1f;          
         }
         else myTime -= Time.deltaTime;
 
@@ -28,9 +28,10 @@ public class EnemyController : MonoBehaviour {
                     { //В верх
                         GetComponent<Rigidbody>().transform.rotation = new Quaternion(0, 0, 0, 0);
                         target = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1.5f);
-                        if (!Physics.Linecast(transform.position, target))
-                            transform.position = Vector3.Lerp(transform.position, target, speed * Time.deltaTime);
-                        break;
+                    if (!Physics.Linecast(transform.position, target))
+                        transform.position = Vector3.Lerp(transform.position, target, speed * Time.deltaTime);
+                    else myTime = 0;
+                    break;
                     }
                 case 2:
                     { //В низ       
@@ -38,7 +39,8 @@ public class EnemyController : MonoBehaviour {
                         target = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1.5f);
                         if (!Physics.Linecast(transform.position, target))
                             transform.position = Vector3.Lerp(transform.position, target, speed * Time.deltaTime);
-                        break;
+                    else myTime = 0;
+                    break;
                     }
                 case 3:
                     { //на право
@@ -46,7 +48,8 @@ public class EnemyController : MonoBehaviour {
                         target = new Vector3(transform.position.x - 1.5f, transform.position.y, transform.position.z);
                         if (!Physics.Linecast(transform.position, target))
                             transform.position = Vector3.Lerp(transform.position, target, speed * Time.deltaTime);
-                        break;
+                    else myTime = 0;
+                    break;
                     }
                 case 4:
                     { //на лево
@@ -54,7 +57,8 @@ public class EnemyController : MonoBehaviour {
                         target = new Vector3(transform.position.x + 1.5f, transform.position.y, transform.position.z);
                         if (!Physics.Linecast(transform.position, target))
                             transform.position = Vector3.Lerp(transform.position, target, speed * Time.deltaTime);
-                        break;
+                    else myTime = 0;
+                    break;
                     }
             }
 
