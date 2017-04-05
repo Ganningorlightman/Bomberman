@@ -11,7 +11,6 @@ public class GameInitializer : MonoBehaviour {
     public GameObject enemy1;
     public GameObject enemy2;
 
-
     void Start ()
     {
         //floor.Create(new Vector3(6.5f, 1f, 5.5f), "Models/Floor", "Floor");
