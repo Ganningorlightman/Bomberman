@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bomb : MonoBehaviour {
 
     public GameObject explosion;
-
+    public LayerMask wall;
     void Start()
     {
         explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
@@ -24,24 +24,20 @@ public class Bomb : MonoBehaviour {
         StartCoroutine(CreateExplosion(Vector3.back));
         StartCoroutine(CreateExplosion(Vector3.right));
         StartCoroutine(CreateExplosion(Vector3.left));
-        GetComponent<MeshRenderer>().enabled = false;
-        transform.FindChild("Collider").gameObject.SetActive(false);
-        //Destroy(gameObject, 3f);
     }
     private IEnumerator CreateExplosion(Vector3 direction)
     {
         for (int i = 1; i < 3; i++)
         {
             RaycastHit hit;
-            Physics.Raycast(transform.position + new Vector3(0, .5f, 0), direction, out hit, i, 8);
+            Physics.Raycast(transform.position, direction, out hit, i * 5f, wall);
 
             if (!hit.collider)           
-                Instantiate(explosion, transform.position + (i * direction), explosion.transform.rotation);       
+                Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);       
             else            
-                break;
-            
-            yield return new WaitForSeconds(.05f);
+                break;                       
         }
+        yield return new WaitForSeconds(.05f);
     }
 
     public void OnTriggerEnter(Collider col)
