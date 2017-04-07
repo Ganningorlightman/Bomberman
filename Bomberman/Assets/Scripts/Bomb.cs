@@ -6,6 +6,7 @@ public class Bomb : MonoBehaviour {
 
     public GameObject explosion;
     public LayerMask wall;
+    public LayerMask wWall;
     void Start()
     {
         explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
@@ -31,11 +32,18 @@ public class Bomb : MonoBehaviour {
         {
             RaycastHit hit;
             Physics.Raycast(transform.position, direction, out hit, i * 5f, wall);
+            RaycastHit hit1;
+            Physics.Raycast(transform.position, direction, out hit1, i * 5f, wWall);
 
-            if (!hit.collider)           
-                Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);       
-            else            
-                break;                       
+            if ((!hit1.collider) && (!hit.collider))
+                Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);
+            else if ((hit1.collider) && (!hit.collider))
+            {              
+                    Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);
+                    break;                       
+            }
+            else break;
+
         }
         yield return new WaitForSeconds(.05f);
     }

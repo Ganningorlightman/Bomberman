@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour {
 
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
+        //rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
     }
@@ -40,26 +40,27 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         { //В верх          
             myTransform.rotation = new Quaternion(0, 0, 0, 0);
-            if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            Collider[] colliders = Physics.OverlapCapsule(p1, p2, charContr.radius, wall);
+            if (colliders == null || colliders.Length == 0)
+                transform.position += transform.forward * distlLenght;
         }
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         { //В низ    
             myTransform.rotation = new Quaternion(0, 90, 0, 0);
             if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+                transform.position += transform.forward * distlLenght;
         }
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         { //на право
             myTransform.rotation = new Quaternion(0, -90, 0, 90);
             if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+                transform.position += transform.forward * distlLenght;
         }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         { //на лево
             myTransform.rotation = new Quaternion(0, 90, 0, 90);
             if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+                transform.position += transform.forward * distlLenght;
         }
     }
 
