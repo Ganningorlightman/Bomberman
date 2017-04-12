@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    public float moveSpeed = 15f;
+    public float moveSpeed = 10f;
 
     private Rigidbody rigidBody;
     private Transform myTransform;
@@ -12,11 +12,19 @@ public class PlayerController : MonoBehaviour {
     public GameObject bomb;
     private CharacterController charContr;
     public float distlLenght = 1.5f;
-    public LayerMask wall;
+    public LayerMask wallLayer;
+    public LayerMask wWallLayer;
+    public LayerMask bombLayer;
+    public int Bombs;
+    public int Flames;
+    public bool Wallpass;
+    public bool Bombpass;
+    public bool Flamepass;
+    public bool Detonator;
 
     void Start()
     {
-        //rigidBody = GetComponent<Rigidbody>();
+        rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
     }
@@ -32,35 +40,58 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void UpdatePlayerMovement()
+    {       
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        { //В верх          
+            myTransform.rotation = new Quaternion(0, 0, 0, 0);
+            if (CheckLayers())
+                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        { //В низ    
+            myTransform.rotation = new Quaternion(0, 90, 0, 0);
+            if (CheckLayers())
+                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        { //на право
+            myTransform.rotation = new Quaternion(0, -90, 0, 90);
+            if (CheckLayers())
+                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        { //на лево
+            myTransform.rotation = new Quaternion(0, 90, 0, 90);
+            if (CheckLayers())
+                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+        }
+    }
+    
+    private bool CheckLayers()
     {
         RaycastHit hit;
         Vector3 p1 = transform.position + charContr.center + Vector3.up * -charContr.height * 0.5F;
         Vector3 p2 = p1 + Vector3.up * charContr.height;
 
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-        { //В верх          
-            myTransform.rotation = new Quaternion(0, 0, 0, 0);
-            Collider[] colliders = Physics.OverlapCapsule(p1, p2, charContr.radius, wall);
-            if (colliders == null || colliders.Length == 0)
-                transform.position += transform.forward * distlLenght;
+        if ((!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wallLayer)) && Wallpass && Bombpass)
+        {
+            return true;
         }
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-        { //В низ    
-            myTransform.rotation = new Quaternion(0, 90, 0, 0);
-            if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                transform.position += transform.forward * distlLenght;
+        else if ((!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wallLayer)) && (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wWallLayer)) && !Wallpass && Bombpass)
+            {
+            return true;
+            }
+        else if ((!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wallLayer)) && (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, bombLayer)) && Wallpass && !Bombpass)
+        {
+            return true;
         }
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-        { //на право
-            myTransform.rotation = new Quaternion(0, -90, 0, 90);
-            if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                transform.position += transform.forward * distlLenght;
+        else if ((!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wallLayer)) && (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, bombLayer)) && (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wWallLayer)) && !Wallpass && !Bombpass)
+        {
+            return true;
         }
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        { //на лево
-            myTransform.rotation = new Quaternion(0, 90, 0, 90);
-            if (!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wall))
-                transform.position += transform.forward * distlLenght;
+        else
+        {
+            return false;
         }
     }
 
@@ -68,15 +99,55 @@ public class PlayerController : MonoBehaviour {
     {
         bomb = (Resources.Load("Models/Bomb", typeof(GameObject))) as GameObject;
         bomb.transform.localScale = new Vector3(5f, 5f, 5f);
-        bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), myTransform.position.y, Mathf.RoundToInt(myTransform.position.z));    
+        bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), myTransform.position.y, Mathf.RoundToInt(myTransform.position.z));
         Instantiate(bomb);       
     }
 
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Enemy") || col.CompareTag("Explosion"))
+        if (col.CompareTag("Enemy"))
         {
             Destroy(gameObject);
+        }
+
+        if (col.CompareTag("Explosion") && !Flamepass)
+        {
+            Destroy(gameObject);
+        }
+
+        if (col.CompareTag("Bombs"))
+        {
+            Bombs++;
+        }
+
+        if (col.CompareTag("Flames"))
+        {
+            Flames++;
+        }
+
+        if (col.CompareTag("Speed"))
+        {
+            moveSpeed += 5f;
+        }
+
+        if (col.CompareTag("WallPass"))
+        {
+            Wallpass = true;
+        }
+
+        if (col.CompareTag("BombPass"))
+        {
+            Bombpass = true;
+        }
+
+        if (col.CompareTag("FlamePass"))
+        {
+            Flamepass = true;
+        }
+
+        if (col.CompareTag("Detonator"))
+        {
+            Detonator = true;
         }
     }
 

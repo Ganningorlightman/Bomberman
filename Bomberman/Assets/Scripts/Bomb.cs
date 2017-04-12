@@ -7,6 +7,7 @@ public class Bomb : MonoBehaviour {
     public GameObject explosion;
     public LayerMask wall;
     public LayerMask wWall;
+    public int Flames;
     void Start()
     {
         explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
@@ -28,7 +29,7 @@ public class Bomb : MonoBehaviour {
     }
     private IEnumerator CreateExplosion(Vector3 direction)
     {
-        for (int i = 1; i < 3; i++)
+        for (int i = 1; i < Flames + 1; i++)
         {
             RaycastHit hit;
             Physics.Raycast(transform.position, direction, out hit, i * 5f, wall);

@@ -10,6 +10,7 @@ public class GameInitializer : MonoBehaviour {
     public GameObject player;
     public GameObject enemy1;
     public GameObject enemy2;
+    public GameObject bonus;
 
     void Start ()
     {
@@ -77,6 +78,21 @@ public class GameInitializer : MonoBehaviour {
         Instantiate(wWalls);
         wWalls.transform.position = new Vector3(-25f, 0, 40f);
         Instantiate(wWalls);
+
+        bonus = (Resources.Load("Models/Bombs", typeof(GameObject))) as GameObject;      
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/Flames", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/Speed", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/WallPass", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/BombPass", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/FlamePass", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
+        bonus = (Resources.Load("Models/Detonator", typeof(GameObject))) as GameObject;
+        Instantiate(bonus);
 
         player = (Resources.Load("Models/Player", typeof(GameObject))) as GameObject;
         player.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
