@@ -26,6 +26,7 @@ public class Bomb : MonoBehaviour {
         StartCoroutine(CreateExplosion(Vector3.back));
         StartCoroutine(CreateExplosion(Vector3.right));
         StartCoroutine(CreateExplosion(Vector3.left));
+        Destroy(gameObject);
     }
     private IEnumerator CreateExplosion(Vector3 direction)
     {
@@ -53,7 +54,8 @@ public class Bomb : MonoBehaviour {
     {
         if (col.CompareTag("Explosion"))
         {
-            Destroy(gameObject);
+            CancelInvoke("Explode");
+            Explode();
         }
     }
 }
