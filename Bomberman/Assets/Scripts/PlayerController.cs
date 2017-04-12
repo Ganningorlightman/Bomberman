@@ -1,10 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-
-    public float moveSpeed = 10f;
 
     private Rigidbody rigidBody;
     private Transform myTransform;
@@ -15,7 +14,9 @@ public class PlayerController : MonoBehaviour {
     public LayerMask wallLayer;
     public LayerMask wWallLayer;
     public LayerMask bombLayer;
+    public float moveSpeed;
     public int Bombs;
+    public int BombsCounter = 0;
     public int Flames;
     public bool Wallpass;
     public bool Bombpass;
@@ -44,29 +45,32 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         { //В верх          
             myTransform.rotation = new Quaternion(0, 0, 0, 0);
-            if (CheckLayers())
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            Move();
         }
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         { //В низ    
             myTransform.rotation = new Quaternion(0, 90, 0, 0);
-            if (CheckLayers())
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            Move();
         }
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         { //на право
             myTransform.rotation = new Quaternion(0, -90, 0, 90);
-            if (CheckLayers())
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            Move();
         }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         { //на лево
             myTransform.rotation = new Quaternion(0, 90, 0, 90);
-            if (CheckLayers())
-                rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            Move();
         }
+        
     }
-    
+
+    private void Move()
+    {
+        if (CheckLayers())
+            rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+    }
+
     private bool CheckLayers()
     {
         RaycastHit hit;
@@ -97,12 +101,19 @@ public class PlayerController : MonoBehaviour {
 
     private void DropBomb()
     {
-        bomb = (Resources.Load("Models/Bomb", typeof(GameObject))) as GameObject;
-        bomb.transform.localScale = new Vector3(5f, 5f, 5f);
-        bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), myTransform.position.y, Mathf.RoundToInt(myTransform.position.z));
-        Instantiate(bomb);       
+        if (BombsCounter < Bombs) {
+            BombsCounter++;           
+            bomb = ObjectLoader.getObject("Bomb");
+            bomb.transform.localScale = new Vector3(5f, 5f, 5f);
+            bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), myTransform.position.y, Mathf.RoundToInt(myTransform.position.z));
+            var bombObject = Instantiate(bomb);
+            Bomb bombBehavior = bombObject.GetComponent<Bomb>();
+            bombBehavior.Flames = Flames;
+            if (Detonator) bombBehavior.Detonator = true;
+            bombBehavior.Initialized(() => { BombsCounter--; if (BombsCounter < 0) BombsCounter = 0; });
+        }
     }
-
+  
     public void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Enemy"))
@@ -118,70 +129,44 @@ public class PlayerController : MonoBehaviour {
         if (col.CompareTag("Bombs"))
         {
             Bombs++;
+            Destroy(col.gameObject);         
         }
 
         if (col.CompareTag("Flames"))
         {
             Flames++;
+            Destroy(col.gameObject);
         }
 
         if (col.CompareTag("Speed"))
         {
             moveSpeed += 5f;
+            Destroy(col.gameObject);
         }
 
         if (col.CompareTag("WallPass"))
         {
             Wallpass = true;
+            Destroy(col.gameObject);
         }
 
         if (col.CompareTag("BombPass"))
         {
             Bombpass = true;
+            Destroy(col.gameObject);
         }
 
         if (col.CompareTag("FlamePass"))
         {
             Flamepass = true;
+            Destroy(col.gameObject);
         }
 
         if (col.CompareTag("Detonator"))
         {
             Detonator = true;
+            Destroy(col.gameObject);
         }
     }
-
-    //private void UpdatePlayerMovement()
-    //{
-    //    RaycastHit hit;
-    //    if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-    //    { //В верх          
-    //        myTransform.rotation = new Quaternion(0, 0, 0, 0);
-    //        target = new Vector3(myTransform.position.x, myTransform.position.y, myTransform.position.z + distlLenght);
-    //        if (!Physics.Linecast(myTransform.position, target))
-    //            rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
-    //    }
-    //    if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-    //    { //В низ    
-    //        myTransform.rotation = new Quaternion(0, 90, 0, 0);
-    //        target = new Vector3(myTransform.position.x, myTransform.position.y, myTransform.position.z - distlLenght);
-    //        if (!Physics.Linecast(myTransform.position, target))
-    //            rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
-    //    }
-    //    if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-    //    { //на право
-    //        myTransform.rotation = new Quaternion(0, -90, 0, 90);
-    //        target = new Vector3(myTransform.position.x - distlLenght, myTransform.position.y, myTransform.position.z);
-    //        if (!Physics.Linecast(myTransform.position, target))
-    //            rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
-    //    }
-    //    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-    //    { //на лево
-    //        myTransform.rotation = new Quaternion(0, 90, 0, 90);
-    //        target = new Vector3(myTransform.position.x + distlLenght, myTransform.position.y, myTransform.position.z);
-    //        if (!Physics.Linecast(myTransform.position, target))
-    //            rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
-    //    }
-    //}
 
 }

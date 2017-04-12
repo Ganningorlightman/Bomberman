@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,15 +9,26 @@ public class Bomb : MonoBehaviour {
     public LayerMask wall;
     public LayerMask wWall;
     public int Flames;
+    public bool Detonator;
+
+    Action callback;
     void Start()
     {
         explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
-        Invoke("Explode", 3f);
+    }
+    public void Initialized(Action callback)
+    {
+        this.callback = callback;
     }
 
     void Update()
     {
-       
+        if (Detonator)
+        {
+            if (Input.GetKey(KeyCode.E)) Explode();
+        }
+        else
+            Invoke("Explode", 3f);
     }
 
     void Explode()
@@ -27,6 +39,8 @@ public class Bomb : MonoBehaviour {
         StartCoroutine(CreateExplosion(Vector3.right));
         StartCoroutine(CreateExplosion(Vector3.left));
         Destroy(gameObject);
+        if (callback != null)
+            callback();
     }
     private IEnumerator CreateExplosion(Vector3 direction)
     {

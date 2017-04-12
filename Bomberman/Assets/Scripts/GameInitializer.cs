@@ -49,7 +49,6 @@ public class GameInitializer : MonoBehaviour {
         }
 
         wWalls = (Resources.Load("Models/WWall", typeof(GameObject))) as GameObject;
-        wWalls.transform.localScale = new Vector3(5f, 5f, 5f);
         wWalls.transform.position = new Vector3(-15f, 0, 5f);           
         Instantiate(wWalls);
         wWalls.transform.position = new Vector3(-20f, 0, 5f);
@@ -95,19 +94,21 @@ public class GameInitializer : MonoBehaviour {
         Instantiate(bonus);
 
         player = (Resources.Load("Models/Player", typeof(GameObject))) as GameObject;
-        player.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
         player.transform.position = new Vector3(-5f, 0, 5f);    
         Instantiate(player);
 
         enemy1 = (Resources.Load("Models/Enemy1", typeof(GameObject))) as GameObject;
-        enemy1.transform.localScale = new Vector3(5f, 5f, 5f);
         enemy1.transform.position = new Vector3(-15f, 0, 15f);     
         Instantiate(enemy1);
+        GameController.Enemy++;
+        enemy1.transform.position = new Vector3(-35f, 0, 5f);
+        Instantiate(enemy1);
+        GameController.Enemy++;
 
         enemy2 = (Resources.Load("Models/Enemy2", typeof(GameObject))) as GameObject;
-        enemy2.transform.localScale = new Vector3(5f, 5f, 5f);
         enemy2.transform.position = new Vector3(-45f, 0, 45f);     
         Instantiate(enemy2);
+        GameController.Enemy++;
     }
     void Update ()
     {
