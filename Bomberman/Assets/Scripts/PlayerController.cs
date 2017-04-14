@@ -7,13 +7,14 @@ public class PlayerController : MonoBehaviour {
 
     private Rigidbody rigidBody;
     private Transform myTransform;
-    private Vector3 target;
     public GameObject bomb;
     private CharacterController charContr;
-    public float distlLenght = 1.5f;
+    private float distlLenght = 1.5f;
+
     public LayerMask wallLayer;
     public LayerMask wWallLayer;
     public LayerMask bombLayer;
+
     public float moveSpeed;
     public int Bombs;
     private int BombsCounter = 0;
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {  
-        UpdatePlayerMovement();
+        PlayerMovement();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -40,7 +41,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void UpdatePlayerMovement()
+    private void PlayerMovement()
     {       
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         { //В верх          
@@ -102,10 +103,19 @@ public class PlayerController : MonoBehaviour {
     private void DropBomb()
     {
         if (BombsCounter < Bombs) {
-            BombsCounter++;           
+            BombsCounter++;
+
             bomb = ObjectLoader.getObject("Models/Bomb");
-            bomb.transform.localScale = new Vector3(5f, 5f, 5f);
-            bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), 0f, Mathf.RoundToInt(myTransform.position.z));
+            int x = Mathf.RoundToInt(myTransform.position.x);
+            int z = Mathf.RoundToInt(myTransform.position.z);          
+            if ((Mathf.Abs(x) % 5) >= 2)
+                x = x - (x % 5) - 5;
+            else x = x - (x % 5);
+            if ((Mathf.Abs(z) % 5) >= 2)
+                z = z - (z % 5) + 5;
+            else z = z - (z % 5);
+            bomb.transform.position = new Vector3(x, 0f, z);
+
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();
             bombBehavior.Flames = Flames;

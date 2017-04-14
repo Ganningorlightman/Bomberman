@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
-    	
-	public float speed;
-    private Vector3 target;
+    		
     private float myTime = 0f;
     private int direc;
     private Rigidbody rigidBody;
-    private Transform myTransform;
     private CharacterController charContr;
+
     public LayerMask wallLayer;
     public LayerMask wWallLayer;
     public LayerMask bombLayer;
+
+    public float speed;
     public bool Wallpass;
     public int points;
 
