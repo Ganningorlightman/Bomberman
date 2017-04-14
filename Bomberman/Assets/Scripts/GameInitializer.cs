@@ -14,13 +14,12 @@ public class GameInitializer : MonoBehaviour {
 
     void Start ()
     {
-        floor = (Resources.Load("Models/Floor", typeof(GameObject))) as GameObject;
+        floor = ObjectLoader.getObject("Models/Floor");
         floor.transform.localScale = new Vector3(6.5f, 1f, 5.5f);
         floor.transform.position = new Vector3(-30f, -2.5f, 25f);   
         Instantiate(floor);
 
-        walls = (Resources.Load("Models/Wall", typeof(GameObject))) as GameObject;
-        walls.transform.localScale = new Vector3(5f, 5f, 5f);
+        walls = ObjectLoader.getObject("Models/Wall");       
 
         for (int i = 0; i < 11 * 5; i += 5)
         {
@@ -48,7 +47,7 @@ public class GameInitializer : MonoBehaviour {
                 }
         }
 
-        wWalls = (Resources.Load("Models/WWall", typeof(GameObject))) as GameObject;
+        wWalls = ObjectLoader.getObject("Models/WWall");
         wWalls.transform.position = new Vector3(-15f, 0, 5f);           
         Instantiate(wWalls);
         wWalls.transform.position = new Vector3(-20f, 0, 5f);
@@ -76,28 +75,27 @@ public class GameInitializer : MonoBehaviour {
         wWalls.transform.position = new Vector3(-25f, 0, 35f);
         Instantiate(wWalls);
         wWalls.transform.position = new Vector3(-25f, 0, 40f);
-        Instantiate(wWalls);
+        Instantiate(wWalls);      
 
-        bonus = (Resources.Load("Models/Bombs", typeof(GameObject))) as GameObject;      
+        bonus = ObjectLoader.getObject("Models/Bombs");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/Flames", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/Flames");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/Speed", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/Speed");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/WallPass", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/WallPass");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/BombPass", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/BombPass");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/FlamePass", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/FlamePass");
         Instantiate(bonus);
-        bonus = (Resources.Load("Models/Detonator", typeof(GameObject))) as GameObject;
+        bonus = ObjectLoader.getObject("Models/Detonator");
         Instantiate(bonus);
 
-        player = (Resources.Load("Models/Player", typeof(GameObject))) as GameObject;
-        player.transform.position = new Vector3(-5f, 0, 5f);    
+        player = ObjectLoader.getObject("Models/Player1");
         Instantiate(player);
 
-        enemy1 = (Resources.Load("Models/Enemy1", typeof(GameObject))) as GameObject;
+        enemy1 = ObjectLoader.getObject("Models/Enemy1");
         enemy1.transform.position = new Vector3(-15f, 0, 15f);     
         Instantiate(enemy1);
         GameController.Enemy++;
@@ -105,7 +103,7 @@ public class GameInitializer : MonoBehaviour {
         Instantiate(enemy1);
         GameController.Enemy++;
 
-        enemy2 = (Resources.Load("Models/Enemy2", typeof(GameObject))) as GameObject;
+        enemy2 = ObjectLoader.getObject("Models/Enemy2");
         enemy2.transform.position = new Vector3(-45f, 0, 45f);     
         Instantiate(enemy2);
         GameController.Enemy++;

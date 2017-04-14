@@ -6,6 +6,6 @@ public class ObjectLoader : MonoBehaviour {
 
     public static GameObject getObject(string path)
     {
-        return (Resources.Load("Models/" + path, typeof(GameObject))) as GameObject;
+        return (Resources.Load(path, typeof(GameObject))) as GameObject;
     }
 }

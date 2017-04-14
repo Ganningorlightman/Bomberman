@@ -13,8 +13,8 @@ public class Bomb : MonoBehaviour {
 
     Action callback;
     void Start()
-    {
-        explosion = (Resources.Load("Models/Explosion", typeof(GameObject))) as GameObject;
+    {       
+        explosion = ObjectLoader.getObject("Models/Explosion");
     }
     public void Initialized(Action callback)
     {

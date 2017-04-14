@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour {
     public LayerMask bombLayer;
     public float moveSpeed;
     public int Bombs;
-    public int BombsCounter = 0;
+    private int BombsCounter = 0;
     public int Flames;
     public bool Wallpass;
     public bool Bombpass;
@@ -103,9 +103,9 @@ public class PlayerController : MonoBehaviour {
     {
         if (BombsCounter < Bombs) {
             BombsCounter++;           
-            bomb = ObjectLoader.getObject("Bomb");
+            bomb = ObjectLoader.getObject("Models/Bomb");
             bomb.transform.localScale = new Vector3(5f, 5f, 5f);
-            bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), myTransform.position.y, Mathf.RoundToInt(myTransform.position.z));
+            bomb.transform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), 0f, Mathf.RoundToInt(myTransform.position.z));
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();
             bombBehavior.Flames = Flames;
