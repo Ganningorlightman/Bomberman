@@ -9,8 +9,7 @@ public class GameInitializer : MonoBehaviour {
     public GameObject wWalls;
     public GameObject player;
     public GameObject enemy1;
-    public GameObject enemy2;
-    public GameObject bonus;
+    public GameObject enemy2; 
 
     void Start ()
     {
@@ -25,7 +24,7 @@ public class GameInitializer : MonoBehaviour {
         {
             walls.transform.position = new Vector3(0, 0, i);
             Instantiate(walls);
-            walls.transform.position = new Vector3(-12 * 5, 0, i);
+            walls.transform.position = new Vector3(-12 * GameController.BlockAndUnitsSize, 0, i);
             Instantiate(walls);
         }
 
@@ -33,7 +32,7 @@ public class GameInitializer : MonoBehaviour {
         {
             walls.transform.position = new Vector3(-i, 0, 0);
             Instantiate(walls);
-            walls.transform.position = new Vector3(-i, 0, 10 * 5);
+            walls.transform.position = new Vector3(-i, 0, 10 * GameController.BlockAndUnitsSize);
             Instantiate(walls);
         }
 
@@ -77,20 +76,20 @@ public class GameInitializer : MonoBehaviour {
         wWalls.transform.position = new Vector3(-25f, 0, 40f);
         Instantiate(wWalls);      
 
-        bonus = ObjectLoader.getObject("Models/Bombs");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/Flames");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/Speed");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/WallPass");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/BombPass");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/FlamePass");
-        Instantiate(bonus);
-        bonus = ObjectLoader.getObject("Models/Detonator");
-        Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/Bombs");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/Flames");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/Speed");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/WallPass");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/BombPass");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/FlamePass");
+        //Instantiate(bonus);
+        //bonus = ObjectLoader.getObject("Models/Detonator");
+        //Instantiate(bonus);
 
         player = ObjectLoader.getObject("Models/Player1");
         Instantiate(player);
@@ -107,9 +106,5 @@ public class GameInitializer : MonoBehaviour {
         enemy2.transform.position = new Vector3(-45f, 0, 45f);     
         Instantiate(enemy2);
         GameController.Enemy++;
-    }
-    void Update ()
-    {
-
     }
 }

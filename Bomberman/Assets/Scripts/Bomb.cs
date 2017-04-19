@@ -33,12 +33,12 @@ public class Bomb : MonoBehaviour {
 
     void Explode()
     {
+        Destroy(gameObject);
         Instantiate(explosion, transform.position, Quaternion.identity);
         StartCoroutine(CreateExplosion(Vector3.forward));
         StartCoroutine(CreateExplosion(Vector3.back));
         StartCoroutine(CreateExplosion(Vector3.right));
-        StartCoroutine(CreateExplosion(Vector3.left));
-        Destroy(gameObject);
+        StartCoroutine(CreateExplosion(Vector3.left));      
         if (callback != null)
             callback();
     }
@@ -47,15 +47,15 @@ public class Bomb : MonoBehaviour {
         for (int i = 1; i < Flames + 1; i++)
         {
             RaycastHit hit;
-            Physics.Raycast(transform.position, direction, out hit, i * 5f, wall);
+            Physics.Raycast(transform.position, direction, out hit, i * GameController.BlockAndUnitsSize, wall);
             RaycastHit hit1;
-            Physics.Raycast(transform.position, direction, out hit1, i * 5f, wWall);
+            Physics.Raycast(transform.position, direction, out hit1, i * GameController.BlockAndUnitsSize, wWall);
 
             if ((!hit1.collider) && (!hit.collider))
-                Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);
+                Instantiate(explosion, transform.position + (i * direction * GameController.BlockAndUnitsSize), explosion.transform.rotation);
             else if ((hit1.collider) && (!hit.collider))
             {              
-                    Instantiate(explosion, transform.position + (i * direction * 5f), explosion.transform.rotation);
+                    Instantiate(explosion, transform.position + (i * direction * GameController.BlockAndUnitsSize), explosion.transform.rotation);
                     break;                       
             }
             else break;

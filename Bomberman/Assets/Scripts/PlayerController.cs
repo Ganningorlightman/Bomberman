@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject bomb;
     private CharacterController charContr;
     private float distlLenght = 1.5f;
+    private Animator ani;
 
     public LayerMask wallLayer;
     public LayerMask wWallLayer;
@@ -23,21 +24,27 @@ public class PlayerController : MonoBehaviour {
     public bool Bombpass;
     public bool Flamepass;
     public bool Detonator;
+    private bool dead = false;
 
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
+        ani = GetComponent<Animator>();
     }
 
     void Update()
-    {  
-        PlayerMovement();
-
-        if (Input.GetKeyDown(KeyCode.Space))
+    {
+        if (!dead)
         {
-            DropBomb();
+            PlayerMovement();
+            
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                ani.SetTrigger("Plant");
+                DropBomb();
+            }
         }
     }
 
@@ -48,28 +55,30 @@ public class PlayerController : MonoBehaviour {
             myTransform.rotation = new Quaternion(0, 0, 0, 0);
             Move();
         }
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         { //В низ    
             myTransform.rotation = new Quaternion(0, 90, 0, 0);
             Move();
         }
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         { //на право
             myTransform.rotation = new Quaternion(0, -90, 0, 90);
             Move();
         }
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         { //на лево
             myTransform.rotation = new Quaternion(0, 90, 0, 90);
             Move();
         }
-        
+        else ani.SetBool("Speed", false);
+
     }
 
     private void Move()
     {
-        if (CheckLayers())
+        if (CheckLayers())        
             rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            ani.SetBool("Speed", true);           
     }
 
     private bool CheckLayers()
@@ -106,14 +115,14 @@ public class PlayerController : MonoBehaviour {
             BombsCounter++;
 
             bomb = ObjectLoader.getObject("Models/Bomb");
-            int x = Mathf.RoundToInt(myTransform.position.x);
-            int z = Mathf.RoundToInt(myTransform.position.z);          
-            if ((Mathf.Abs(x) % 5) >= 2)
-                x = x - (x % 5) - 5;
-            else x = x - (x % 5);
-            if ((Mathf.Abs(z) % 5) >= 2)
-                z = z - (z % 5) + 5;
-            else z = z - (z % 5);
+            float x = Mathf.RoundToInt(myTransform.position.x);
+            float z = Mathf.RoundToInt(myTransform.position.z);          
+            if ((Mathf.Abs(x) % GameController.BlockAndUnitsSize) >= (int)(GameController.BlockAndUnitsSize / 2))
+                x = x - (x % GameController.BlockAndUnitsSize) - GameController.BlockAndUnitsSize;
+            else x = x - (x % GameController.BlockAndUnitsSize);
+            if ((Mathf.Abs(z) % GameController.BlockAndUnitsSize) >= (int)(GameController.BlockAndUnitsSize / 2))
+                z = z - (z % GameController.BlockAndUnitsSize) + GameController.BlockAndUnitsSize;
+            else z = z - (z % GameController.BlockAndUnitsSize);
             bomb.transform.position = new Vector3(x, 0f, z);
 
             var bombObject = Instantiate(bomb);
@@ -123,17 +132,26 @@ public class PlayerController : MonoBehaviour {
             bombBehavior.Initialized(() => { BombsCounter--; if (BombsCounter < 0) BombsCounter = 0; });
         }
     }
+    private void Dead()
+    {
+        dead = true;
+        ani.SetTrigger("Death");
+        Destroy(gameObject, 4f);
+        GetComponent<Collider>().enabled = false;
+        print("Defeat");
+        print(GameController.Points);
+    }
   
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Enemy"))
+        if (col.CompareTag("Enemy") && (!dead))
         {
-            Destroy(gameObject);
+            Dead();
         }
 
-        if (col.CompareTag("Explosion") && !Flamepass)
+        if (col.CompareTag("Explosion") && (!Flamepass) && (!dead))
         {
-            Destroy(gameObject);
+            Dead();
         }
 
         if (col.CompareTag("Bombs"))
@@ -176,6 +194,12 @@ public class PlayerController : MonoBehaviour {
         {
             Detonator = true;
             Destroy(col.gameObject);
+        }
+
+        if ((col.CompareTag("Exit")) && (GameController.ExitOpen))
+        {
+            print("Win");
+            print(GameController.Points);
         }
     }
 

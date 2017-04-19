@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour {
     public float speed;
     public bool Wallpass;
     public int points;
+    private bool dead = false;
 
     void Start()
     {
@@ -23,38 +24,41 @@ public class EnemyController : MonoBehaviour {
         charContr = GetComponent<CharacterController>();
     }
     void Update()
-    {                       
-        if (myTime <= 0)
+    {
+        if (!dead)
         {
-            direc = Random.Range(1, 5);
-            myTime = 1.5f;          
-        }
-        else myTime -= Time.deltaTime;
+            if (myTime <= 0)
+            {
+                direc = Random.Range(1, 5);
+                myTime = 1.5f;
+            }
+            else myTime -= Time.deltaTime;
 
-        switch (direc)
-        {
-            case 1:
-                { //В верх
-                    rigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
-                    break;
-                }
-            case 2:
-                { //В низ       
-                    rigidBody.transform.rotation = new Quaternion(0, 90, 0, 0);
-                    break;
-                }
-            case 3:
-                { //на право
-                    rigidBody.transform.rotation = new Quaternion(0, -90, 0, 90);
-                    break;
-                }
-            case 4:
-                { //на лево
-                    rigidBody.transform.rotation = new Quaternion(0, 90, 0, 90);                 
-                    break;
-                }
+            switch (direc)
+            {
+                case 1:
+                    { //В верх
+                        rigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
+                        break;
+                    }
+                case 2:
+                    { //В низ       
+                        rigidBody.transform.rotation = new Quaternion(0, 90, 0, 0);
+                        break;
+                    }
+                case 3:
+                    { //на право
+                        rigidBody.transform.rotation = new Quaternion(0, -90, 0, 90);
+                        break;
+                    }
+                case 4:
+                    { //на лево
+                        rigidBody.transform.rotation = new Quaternion(0, 90, 0, 90);
+                        break;
+                    }
+            }
+            Move();
         }
-        Move();
     }
 
     private void Move()
@@ -85,11 +89,14 @@ public class EnemyController : MonoBehaviour {
 
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Explosion"))
+        if (col.CompareTag("Explosion") && (!dead))
         {
-            Destroy(gameObject);
+            dead = true;
+            Destroy(gameObject, 2f);
+            GetComponent<Collider>().enabled = false;
             GameController.Enemy--;
             GameController.Points += points;
+            if (GameController.Enemy == 0) GameController.ExitOpen = true;
         }
     }
 }
