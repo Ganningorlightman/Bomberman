@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class WoodenWall : MonoBehaviour {
 
-    public bool exit = false;
-    public bool bonus = false;
     private int rand;
+    private bool destroy = false;
     private GameObject UnderObject;
 
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Explosion"))
-        {          
+        if (col.CompareTag("Explosion") && (!destroy))
+        {
+            destroy = true;
             Destroy(gameObject);
             GameController.WWall--;          
             if((GameController.WWall == 0) && (!GameController.ExitCreated))
@@ -24,8 +24,8 @@ public class WoodenWall : MonoBehaviour {
             }
             else
             {
-                rand = Random.Range(0, 4);
-                if((rand == 2) && (!GameController.ExitCreated))
+                rand = Random.Range(0, 7);
+                if((rand == 1) && (!GameController.ExitCreated))
                 {
                     UnderObject = ObjectLoader.getObject("Models/Exit");
                     UnderObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);

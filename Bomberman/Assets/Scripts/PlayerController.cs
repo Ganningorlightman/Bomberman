@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour {
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
-        ani = GetComponent<Animator>();
+        ani = GetComponent<Animator>();       
     }
 
     void Update()
