@@ -40,11 +40,8 @@ public class PlayerController : MonoBehaviour {
         {
             PlayerMovement();
             
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                ani.SetTrigger("Plant");
-                DropBomb();
-            }
+            if (Input.GetKeyDown(KeyCode.P))                        
+                DropBomb();          
         }
     }
 
@@ -124,7 +121,7 @@ public class PlayerController : MonoBehaviour {
                 z = z - (z % GameController.BlockAndUnitsSize) + GameController.BlockAndUnitsSize;
             else z = z - (z % GameController.BlockAndUnitsSize);
             bomb.transform.position = new Vector3(x, 0f, z);
-
+            ani.SetTrigger("Plant");
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();
             bombBehavior.Flames = Flames;
@@ -168,7 +165,7 @@ public class PlayerController : MonoBehaviour {
 
         if (col.CompareTag("Speed"))
         {
-            moveSpeed += 5f;
+            moveSpeed += 2f;
             Destroy(col.gameObject);
         }
 
