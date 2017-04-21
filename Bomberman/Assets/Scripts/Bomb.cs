@@ -10,11 +10,14 @@ public class Bomb : MonoBehaviour {
     public LayerMask wWall;
     public int Flames;
     public bool Detonator;
+    private bool destroy = false;
+    public AudioSource ExpAudio;
 
     Action callback;
     void Start()
     {       
         explosion = ObjectLoader.getObject("Models/Explosion");
+        if (!Detonator) Invoke("Explode", 3f);
     }
     public void Initialized(Action callback)
     {
@@ -22,23 +25,23 @@ public class Bomb : MonoBehaviour {
     }
 
     void Update()
-    {
-        if (Detonator)
-        {
-            if (Input.GetKey(KeyCode.E)) Explode();
-        }
-        else
-            Invoke("Explode", 3f);
+    {        
+       if (Input.GetKey(KeyCode.E) && (Detonator) && (!destroy))            
+                Explode();                                                                      
     }
 
     void Explode()
     {
-        Destroy(gameObject);
+        destroy = true;
+        GetComponent<Collider>().enabled = false;
+        GetComponent<MeshRenderer>().enabled = false;
         Instantiate(explosion, transform.position, Quaternion.identity);
         StartCoroutine(CreateExplosion(Vector3.forward));
         StartCoroutine(CreateExplosion(Vector3.back));
         StartCoroutine(CreateExplosion(Vector3.right));
-        StartCoroutine(CreateExplosion(Vector3.left));      
+        StartCoroutine(CreateExplosion(Vector3.left));
+        ExpAudio.Play();
+        Destroy(gameObject, 0.5f);
         if (callback != null)
             callback();
     }
@@ -66,7 +69,7 @@ public class Bomb : MonoBehaviour {
 
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Explosion"))
+        if (col.CompareTag("Explosion") && (!destroy))
         {
             CancelInvoke("Explode");
             Explode();
