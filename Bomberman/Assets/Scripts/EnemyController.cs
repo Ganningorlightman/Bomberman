@@ -95,7 +95,7 @@ public class EnemyController : MonoBehaviour {
             Destroy(gameObject, 2f);
             GetComponent<Collider>().enabled = false;
             GameController.Enemy--;
-            GameController.Points += points;
+            GameController.Score += points;
             if (GameController.Enemy == 0) GameController.ExitOpen = true;
         }
     }

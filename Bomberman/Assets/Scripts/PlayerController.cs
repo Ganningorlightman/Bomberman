@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour {
         Destroy(gameObject, 4f);
         GetComponent<Collider>().enabled = false;
         print("Defeat");
-        print(GameController.Points);
+        print(GameController.Score);
     }
   
     public void OnTriggerEnter(Collider col)
@@ -196,7 +196,7 @@ public class PlayerController : MonoBehaviour {
         if ((col.CompareTag("Exit")) && (GameController.ExitOpen))
         {
             print("Win");
-            print(GameController.Points);
+            print(GameController.Score);
         }
     }
 

@@ -107,4 +107,9 @@ public class GameInitializer : MonoBehaviour {
         Instantiate(enemy2);
         GameController.Enemy++;
     }
+
+    void OnGUI() {
+        GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score);
+    }
+    
 }
