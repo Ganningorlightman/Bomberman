@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour {
         if (BombsCounter < Bombs) {
             BombsCounter++;
 
-            bomb = ObjectLoader.getObject("Models/Bomb");
+            bomb = ObjectLoader.GetObject("Models/Bomb");
             float x = Mathf.RoundToInt(myTransform.position.x);
             float z = Mathf.RoundToInt(myTransform.position.z);          
             if ((Mathf.Abs(x) % GameController.BlockAndUnitsSize) >= (int)(GameController.BlockAndUnitsSize / 2))

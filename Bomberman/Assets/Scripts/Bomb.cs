@@ -16,7 +16,7 @@ public class Bomb : MonoBehaviour {
     Action callback;
     void Start()
     {       
-        explosion = ObjectLoader.getObject("Models/Explosion");
+        explosion = ObjectLoader.GetObject("Models/Explosion");
         if (!Detonator) Invoke("Explode", 3f);
     }
     public void Initialized(Action callback)

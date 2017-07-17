@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ObjectLoader : MonoBehaviour {
 
-    public static GameObject getObject(string path)
-    {
+    public static GameObject GetObject(string path) {
         return (Resources.Load(path, typeof(GameObject))) as GameObject;
     }
 }

@@ -13,12 +13,12 @@ public class GameInitializer : MonoBehaviour {
 
     void Start ()
     {
-        floor = ObjectLoader.getObject("Models/Floor");
+        floor = ObjectLoader.GetObject("Models/Floor");
         floor.transform.localScale = new Vector3(6.5f, 1f, 5.5f);
         floor.transform.position = new Vector3(-30f, -2.5f, 25f);   
         Instantiate(floor);
 
-        walls = ObjectLoader.getObject("Models/Wall");       
+        walls = ObjectLoader.GetObject("Models/Wall");       
 
         for (int i = 0; i < 11 * 5; i += 5)
         {
@@ -46,7 +46,7 @@ public class GameInitializer : MonoBehaviour {
                 }
         }
 
-        wWalls = ObjectLoader.getObject("Models/WWall");
+        wWalls = ObjectLoader.GetObject("Models/WWall");
         wWalls.transform.position = new Vector3(-15f, 0, 5f);           
         Instantiate(wWalls);
         wWalls.transform.position = new Vector3(-20f, 0, 5f);
@@ -91,10 +91,10 @@ public class GameInitializer : MonoBehaviour {
         //bonus = ObjectLoader.getObject("Models/Detonator");
         //Instantiate(bonus);
 
-        player = ObjectLoader.getObject("Models/Player1");
+        player = ObjectLoader.GetObject("Models/Player1");
         Instantiate(player);
 
-        enemy1 = ObjectLoader.getObject("Models/Enemy1");
+        enemy1 = ObjectLoader.GetObject("Models/Enemy1");
         enemy1.transform.position = new Vector3(-15f, 0, 15f);     
         Instantiate(enemy1);
         GameController.Enemy++;
@@ -102,7 +102,7 @@ public class GameInitializer : MonoBehaviour {
         Instantiate(enemy1);
         GameController.Enemy++;
 
-        enemy2 = ObjectLoader.getObject("Models/Enemy2");
+        enemy2 = ObjectLoader.GetObject("Models/Enemy2");
         enemy2.transform.position = new Vector3(-45f, 0, 45f);     
         Instantiate(enemy2);
         GameController.Enemy++;

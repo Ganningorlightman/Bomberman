@@ -17,7 +17,7 @@ public class WoodenWall : MonoBehaviour {
             GameController.WWall--;          
             if((GameController.WWall == 0) && (!GameController.ExitCreated))
             {
-                UnderObject = ObjectLoader.getObject("Models/Exit");                
+                UnderObject = ObjectLoader.GetObject("Models/Exit");                
                 UnderObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
                 Instantiate(UnderObject);
                 GameController.ExitCreated = true;
@@ -27,7 +27,7 @@ public class WoodenWall : MonoBehaviour {
                 rand = Random.Range(0, 7);
                 if((rand == 1) && (!GameController.ExitCreated))
                 {
-                    UnderObject = ObjectLoader.getObject("Models/Exit");
+                    UnderObject = ObjectLoader.GetObject("Models/Exit");
                     UnderObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
                     Instantiate(UnderObject);
                     GameController.ExitCreated = true;
@@ -35,7 +35,7 @@ public class WoodenWall : MonoBehaviour {
                 else if ((rand == 3) && (GameController.BonusesOnLevel > 0))
                 {
 
-                    UnderObject = ObjectLoader.getObject("Models/" + ChooseBonus());
+                    UnderObject = ObjectLoader.GetObject("Models/" + ChooseBonus());
                     UnderObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
                     Instantiate(UnderObject);
                     GameController.BonusesOnLevel--;
