@@ -41,7 +41,7 @@ public class GameInitializer : MonoBehaviour {
         floor = ObjectLoader.GetObject("Models/Floor");
         floor.transform.localScale = new Vector3(width + 1.5f, 1f, height + 1.5f);
         floor.transform.position = new Vector3(-(width + 1f) * BlockSize, -(BlockSize / 2f), (height + 1) * BlockSize);
-        Instantiate(floor);
+        
 
         wall = ObjectLoader.GetObject("Models/Wall");
         for(int i = 0; i < (height * 2 + 3) * BlockSize; i += BlockSize) {
@@ -63,6 +63,8 @@ public class GameInitializer : MonoBehaviour {
                     Instantiate(wall);
                 }
             }
+
+        Instantiate(floor);
     }
 
     void GeneratePlayerAndEnemy() {
