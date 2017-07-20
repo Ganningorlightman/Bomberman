@@ -96,7 +96,6 @@ public class EnemyController : MonoBehaviour {
             GetComponent<Collider>().enabled = false;
             GameController.Enemy--;
             GameController.Score += points;
-            if (GameController.Enemy == 0) GameController.ExitOpen = true;
         }
     }
 }

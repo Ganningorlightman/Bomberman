@@ -108,19 +108,20 @@ public class PlayerController : MonoBehaviour {
 
     private void DropBomb()
     {
+
         if (BombsCounter < Bombs) {
             BombsCounter++;
-
+            var BombSize = 5;
             bomb = ObjectLoader.GetObject("Models/Bomb");
             float x = Mathf.RoundToInt(myTransform.position.x);
             float z = Mathf.RoundToInt(myTransform.position.z);          
-            if ((Mathf.Abs(x) % GameController.BlockAndUnitsSize) >= (int)(GameController.BlockAndUnitsSize / 2))
-                x = x - (x % GameController.BlockAndUnitsSize) - GameController.BlockAndUnitsSize;
-            else x = x - (x % GameController.BlockAndUnitsSize);
-            if ((Mathf.Abs(z) % GameController.BlockAndUnitsSize) >= (int)(GameController.BlockAndUnitsSize / 2))
-                z = z - (z % GameController.BlockAndUnitsSize) + GameController.BlockAndUnitsSize;
-            else z = z - (z % GameController.BlockAndUnitsSize);
-            bomb.transform.position = new Vector3(x, 0f, z);
+            if ((Mathf.Abs(x) % BombSize) >= (int)(BombSize / 2))
+                x = x - (x % BombSize) - BombSize;
+            else x = x - (x % BombSize);
+            if ((Mathf.Abs(z) % BombSize) >= (int)(BombSize / 2))
+                z = z - (z % BombSize) + BombSize;
+            else z = z - (z % BombSize);
+            bomb.transform.position = new Vector3(x, 0f, z);          
             ani.SetTrigger("Plant");
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();

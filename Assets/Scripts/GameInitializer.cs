@@ -5,111 +5,90 @@ using UnityEngine;
 public class GameInitializer : MonoBehaviour {
 
     public GameObject floor;
-    public GameObject walls;
-    public GameObject wWalls;
+    public GameObject wall;
+    public GameObject wWall;
     public GameObject player;
     public GameObject enemy1;
-    public GameObject enemy2; 
+    public GameObject enemy2;
+    //int blockSize = 5;
+    //public int BlockSize {
+    //    get { return blockSize; }
+    //    set {
+    //        floor.gameObject.transform.localScale = new Vector3(value, value, value);
+    //        wall.gameObject.transform.localScale = new Vector3(value, value, value);
+    //        wWall.gameObject.transform.localScale = new Vector3(value, value, value);
+    //        enemy1.gameObject.transform.localScale = new Vector3(value, value, value);
+    //        enemy2.gameObject.transform.localScale = new Vector3(value, value, value);
+    //        blockSize = value;
+    //    }
+    //}
+    public int BlockSize = 5;
+    public int MapWidth = 9;
+    public int MapHeight = 6;
 
-    void Start ()
-    {
-        floor = ObjectLoader.GetObject("Models/Floor");
-        floor.transform.localScale = new Vector3(6.5f, 1f, 5.5f);
-        floor.transform.position = new Vector3(-30f, -2.5f, 25f);   
-        Instantiate(floor);
-
-        walls = ObjectLoader.GetObject("Models/Wall");       
-
-        for (int i = 0; i < 11 * 5; i += 5)
-        {
-            walls.transform.position = new Vector3(0, 0, i);
-            Instantiate(walls);
-            walls.transform.position = new Vector3(-12 * GameController.BlockAndUnitsSize, 0, i);
-            Instantiate(walls);
-        }
-
-        for (int i = 5; i < 12 * 5; i += 5)
-        {
-            walls.transform.position = new Vector3(-i, 0, 0);
-            Instantiate(walls);
-            walls.transform.position = new Vector3(-i, 0, 10 * GameController.BlockAndUnitsSize);
-            Instantiate(walls);
-        }
-
-        for (int i = 5; i < 10 * 5; i += 5)
-            for(int j = 5; j < 12 * 5; j += 5)
-        {
-                if ((j % 2 == 0) && (i % 2 == 0))
-                {
-                    walls.transform.position = new Vector3(-j, 0, i);
-                    Instantiate(walls);
-                }
-        }
-
-        wWalls = ObjectLoader.GetObject("Models/WWall");
-        wWalls.transform.position = new Vector3(-15f, 0, 5f);           
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-20f, 0, 5f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-10f, 0, 15f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-35f, 0, 15f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-35f, 0, 20f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-30f, 0, 15f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-40f, 0, 15f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-35f, 0, 10f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-55f, 0, 10f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-55f, 0, 5f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-50f, 0, 5f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-25f, 0, 30f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-25f, 0, 35f);
-        Instantiate(wWalls);
-        wWalls.transform.position = new Vector3(-25f, 0, 40f);
-        Instantiate(wWalls);      
-
-        //bonus = ObjectLoader.getObject("Models/Bombs");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/Flames");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/Speed");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/WallPass");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/BombPass");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/FlamePass");
-        //Instantiate(bonus);
-        //bonus = ObjectLoader.getObject("Models/Detonator");
-        //Instantiate(bonus);
-
-        player = ObjectLoader.GetObject("Models/Player1");
-        Instantiate(player);
-
-        enemy1 = ObjectLoader.GetObject("Models/Enemy1");
-        enemy1.transform.position = new Vector3(-15f, 0, 15f);     
-        Instantiate(enemy1);
-        GameController.Enemy++;
-        enemy1.transform.position = new Vector3(-35f, 0, 5f);
-        Instantiate(enemy1);
-        GameController.Enemy++;
-
-        enemy2 = ObjectLoader.GetObject("Models/Enemy2");
-        enemy2.transform.position = new Vector3(-45f, 0, 45f);     
-        Instantiate(enemy2);
-        GameController.Enemy++;
+    void Start() {
+        GenerateMap(MapWidth, MapHeight);
+        GeneratePlayerAndEnemy();
+        GenerateWWall(MapWidth, MapHeight);
     }
 
     void OnGUI() {
         GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score);
     }
-    
+
+    void GenerateMap(int width, int height) {
+
+        floor = ObjectLoader.GetObject("Models/Floor");
+        floor.transform.localScale = new Vector3(width + 1.5f, 1f, height + 1.5f);
+        floor.transform.position = new Vector3(-(width + 1f) * BlockSize, -(BlockSize / 2f), (height + 1) * BlockSize);
+        Instantiate(floor);
+
+        wall = ObjectLoader.GetObject("Models/Wall");
+        for(int i = 0; i < (height * 2 + 3) * BlockSize; i += BlockSize) {
+            wall.transform.position = new Vector3(0, 0, i);
+            Instantiate(wall);
+            wall.transform.position = new Vector3(-(width * 2f + 2f) * BlockSize, 0, i);
+            Instantiate(wall);
+        }
+        for(int i = BlockSize; i < (width * 2 + 2) * BlockSize; i += BlockSize) {
+            wall.transform.position = new Vector3(-i, 0, 0);
+            Instantiate(wall);
+            wall.transform.position = new Vector3(-i, 0, (height * 2f + 2f) * BlockSize);
+            Instantiate(wall);
+        }
+        for(int i = BlockSize; i < (height * 2 + 3) * BlockSize; i += BlockSize)
+            for(int j = BlockSize; j < (width * 2 + 3) * BlockSize; j += BlockSize) {
+                if((j % 2 == 0) && (i % 2 == 0)) {
+                    wall.transform.position = new Vector3(-j, 0, i);
+                    Instantiate(wall);
+                }
+            }
+    }
+
+    void GeneratePlayerAndEnemy() {
+        player = ObjectLoader.GetObject("Models/Player1");
+        Instantiate(player);
+        enemy1 = ObjectLoader.GetObject("Models/Enemy1");
+        enemy1.transform.position = new Vector3(-15f, 0, 15f);
+        Instantiate(enemy1);
+        GameController.Enemy++;
+        enemy1.transform.position = new Vector3(-35f, 0, 5f);
+        Instantiate(enemy1);
+        GameController.Enemy++;
+        enemy2 = ObjectLoader.GetObject("Models/Enemy2");
+        enemy2.transform.position = new Vector3(-45f, 0, 45f);
+        Instantiate(enemy2);
+        GameController.Enemy++;
+    }
+
+    void GenerateWWall(int width, int height) {
+        wWall = ObjectLoader.GetObject("Models/WWall");
+        for(int i = BlockSize; i < (width * 2 + 2) * BlockSize; i += BlockSize)
+            for(int j = BlockSize; j < (height * 2 + 2) * BlockSize; j += BlockSize) {
+                if(Random.Range(0f, 1f) <= 0.25f) {
+                    wWall.transform.position = new Vector3(-i, 0, j);
+                    Instantiate(wWall);
+                }
+            }
+    }
 }

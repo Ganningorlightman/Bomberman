@@ -12,6 +12,7 @@ public class Bomb : MonoBehaviour {
     public bool Detonator;
     private bool destroy = false;
     public AudioSource ExpAudio;
+    public float BombSize = 5;
 
     Action callback;
     void Start()
@@ -50,15 +51,15 @@ public class Bomb : MonoBehaviour {
         for (int i = 1; i < Flames + 1; i++)
         {
             RaycastHit hit;
-            Physics.Raycast(transform.position, direction, out hit, i * GameController.BlockAndUnitsSize, wall);
+            Physics.Raycast(transform.position, direction, out hit, i * BombSize, wall);
             RaycastHit hit1;
-            Physics.Raycast(transform.position, direction, out hit1, i * GameController.BlockAndUnitsSize, wWall);
+            Physics.Raycast(transform.position, direction, out hit1, i * BombSize, wWall);
 
             if ((!hit1.collider) && (!hit.collider))
-                Instantiate(explosion, transform.position + (i * direction * GameController.BlockAndUnitsSize), explosion.transform.rotation);
+                Instantiate(explosion, transform.position + (i * direction * BombSize), explosion.transform.rotation);
             else if ((hit1.collider) && (!hit.collider))
             {              
-                    Instantiate(explosion, transform.position + (i * direction * GameController.BlockAndUnitsSize), explosion.transform.rotation);
+                    Instantiate(explosion, transform.position + (i * direction * BombSize), explosion.transform.rotation);
                     break;                       
             }
             else break;
