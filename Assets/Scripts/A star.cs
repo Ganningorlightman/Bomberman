@@ -1,53 +1,222 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Astar {
-
-    public List<Step> OpenList;
-    public List<Step> CloseList;
-
-    public void FindPath(Vector3 start, Vector3 end, Map map) {
-        OpenList = new List<Step>();
-        CloseList = new List<Step>();
-        OpenList.Add(new Step(start));
-
-        while(Check(new Step(end), OpenList)) {
-            int i = MinInOpenList(OpenList);
-            CloseList.Add(OpenList[i]);
-            int j = CloseList.IndexOf(OpenList[i]);
-            OpenList.RemoveAt(i);
-
-        }
-
+public class Heap {
+    public Heap(int maxHeapSize) {
+        items = new IHeapItem[maxHeapSize];
     }
-    public int MinInOpenList(List<Step> openList) {
-        int ind = 0;
-        int min = openList[0].G + openList[0].H;
-        foreach(var step in openList) {
-            if(min > (step.G + step.H)) {
-                ind = openList.IndexOf(step);
-                min = step.G + step.H;
+
+    readonly IHeapItem[] items;
+    int currentItemCount;
+
+    public void Add(IHeapItem item) {
+        item.SetHeapIndex(currentItemCount);
+        items[currentItemCount] = item;
+        SortUp(item);
+        currentItemCount++;
+    }
+
+    public IHeapItem RemoveFirst() {
+        IHeapItem firstItem = items[0];
+        currentItemCount--;
+        items[0] = items[currentItemCount];
+        items[0].SetHeapIndex(0);
+        SortDown(items[0]);
+        return firstItem;
+    }
+
+    public bool Contains(IHeapItem item) {
+        if(items[item.GetHeapIndex()] == null)
+            return false;
+        return items[item.GetHeapIndex()].Equals(item);
+    }
+
+    public void UpdateItem(IHeapItem item) { SortUp(item); }
+
+    public int GetCount() { return currentItemCount; }
+
+    void SortDown(IHeapItem item) {
+        while(true) {
+            int childIndexLeft = item.GetHeapIndex() * 2 + 1;
+            int childIndexRight = item.GetHeapIndex() * 2 + 2;
+            if(childIndexLeft < currentItemCount) {
+                var swapIndex = childIndexLeft;
+                if(childIndexRight < currentItemCount)
+                    if(items[childIndexLeft].CompareTo(items[childIndexRight]) < 0)
+                        swapIndex = childIndexRight;
+                if(item.CompareTo(items[swapIndex]) < 0)
+                    Swap(item, items[swapIndex]);
+                else
+                    return;
+            } else {
+                return;
             }
         }
-        return ind;
     }
-    public bool Check(Step end, List<Step> openList) {
-        return !((openList.Count == 0) || (openList.IndexOf(end) != -1));
+
+    void SortUp(IHeapItem item) {
+        int parentIndex = (item.GetHeapIndex() - 1) / 2;
+
+        while(true) {
+            IHeapItem parentItem = items[parentIndex];
+            if(item.CompareTo(parentItem) > 0)
+                Swap(item, parentItem);
+            else
+                break;
+            parentIndex = (item.GetHeapIndex() - 1) / 2;
+        }
+    }
+
+    void Swap(IHeapItem itemA, IHeapItem itemB) {
+        items[itemA.GetHeapIndex()] = itemB;
+        items[itemB.GetHeapIndex()] = itemA;
+        int itemAIndex = itemA.GetHeapIndex();
+        itemA.SetHeapIndex(itemB.GetHeapIndex());
+        itemB.SetHeapIndex(itemAIndex);
     }
 }
-public class Step {
-    public Vector3 Coordinate;
-    public int G;
-    public int H;
-    public int Parent;
 
-    public Step(Vector3 coordinate) {
-        Coordinate = coordinate;
-        G = 0;
-        H = 0;
+public interface IHeapItem : IComparable {
+    int GetHeapIndex();
+    void SetHeapIndex(int index);
+}
+
+public class Node : CellInfo, IHeapItem {
+    public Node(int gridX, int gridY, UnitType unitType) : base(gridX, gridY, unitType) {
+        GridX = gridX;
+        GridY = gridY;
+        GCost = 0;
+        HCost = 0;
     }
-    public int GetDistance(Step start, Step end, Map map) {
+
+    int heapIndex;
+
+    public readonly int GridX;
+    public readonly int GridY;
+    public int GCost;
+    public int HCost;
+    public Node Parent;
+
+    public int GetFCost() {
+        return GCost + HCost;
+    }
+
+    int CompareInt(int a, int b) {
+        if(a < b)
+            return -1;
+        if(a > b)
+            return 1;
         return 0;
+    }
+
+    #region IComparable
+
+    int IComparable.CompareTo(object o) {
+        Node node = (Node)o;
+        int compare = CompareInt(GetFCost(), node.GetFCost());
+        if(compare == 0)
+            compare = CompareInt(HCost, node.HCost);
+        return -compare;
+    }
+
+    #endregion
+
+    #region IHeapItem
+
+    int IHeapItem.GetHeapIndex() { return heapIndex; }
+    void IHeapItem.SetHeapIndex(int index) { heapIndex = index; }
+
+    #endregion
+}
+
+public class PathFinder {
+    public static int XPixels = 1;
+    public static int YPixels = 1;
+
+    static Node[][] NodeArray;
+    public static void InitializeNodeArray() {
+        NodeArray = new Node[GameInitializer.Map.Width / XPixels][];
+        for(int i = 0; i < GameInitializer.Map.Width / XPixels; i++) {
+            NodeArray[i] = new Node[GameInitializer.Map.Height / YPixels];
+            for(int j = 0; j < GameInitializer.Map.Height / YPixels; j++)
+                NodeArray[i][j] = new Node(i, j, GameInitializer.Map.GetStaticCell(i, j).UnitType);
+        }
+    }
+
+    public static LinkedList<Node> GetNeighbours(Node node) {
+        LinkedList<Node> neighbours = new LinkedList<Node>();
+        for(int i = -1; i < 2; i++) {
+            for(int j = -1; j < 2; j++) {
+                if(i == 0 && j == 0)
+                    continue;
+
+                int checkX = node.GridX + i;
+                int checkY = node.GridY + j;
+
+                if(checkX >= 0 && checkX < GameInitializer.Map.Width / XPixels && checkY >= 0 && checkY < GameInitializer.Map.Height / YPixels) {
+                    var foundNode = NodeArray[checkX][checkY];
+                    if(foundNode.UnitType != UnitType.Wall) {
+                        neighbours.AddLast(foundNode);
+                    }
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
+    public static Stack<Node> FindPath(Vector3 start, Vector3 targer) {
+        return new Stack<Node>(FindPathCore(start, targer));
+    }
+
+    public static Node[] FindPathCore(Vector3 start, Vector3 targer) {
+        Node startNode = NodeArray[(int)(start.x / XPixels)][(int)(start.z / YPixels)];
+        Node targetNode = NodeArray[(int)(targer.x / XPixels)][(int)(targer.z / YPixels)];
+
+        Heap openSet = new Heap(GameInitializer.Map.Width * GameInitializer.Map.Height);
+        LinkedList<Node> closedSet = new LinkedList<Node>();
+        openSet.Add(startNode);
+
+        while(openSet.GetCount() > 0) {
+            Node currentNode = (Node)openSet.RemoveFirst();
+            closedSet.AddLast(currentNode);
+
+            if(currentNode == targetNode) {
+                var path = new LinkedList<Node>();
+                while(targetNode != startNode) {
+                    path.AddLast(targetNode);
+                    targetNode = targetNode.Parent;
+                }
+                return path.Reverse().ToArray();
+            }
+
+            foreach(var neighbour in GetNeighbours(currentNode)) {
+                if(closedSet.Contains(neighbour))
+                    continue;
+
+                int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour);
+                if(newMovementCostToNeighbour < neighbour.GCost || !openSet.Contains(neighbour)) {
+                    neighbour.GCost = newMovementCostToNeighbour;
+                    neighbour.HCost = GetDistance(neighbour, targetNode);
+                    neighbour.Parent = currentNode;
+
+                    if(!openSet.Contains(neighbour)) {
+                        openSet.Add(neighbour);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static int GetDistance(Node node1, Node node2) {
+        int dstX = Math.Abs(node1.GridX - node2.GridX);
+        int dstY = Math.Abs(node1.GridY - node2.GridY);
+        if(dstX > dstY)
+            return 14 * dstY + 10 * (dstX - dstY);
+        return 14 * dstX + 10 * (dstY - dstX);
     }
 }

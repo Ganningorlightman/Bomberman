@@ -5,13 +5,15 @@ using Random = UnityEngine.Random;
 using System.Linq;
 public class Map {
 
-    public readonly int Width;
-    public readonly int Height;
+    readonly int width;
+    public int Width { get { return width + 2; } }
+    readonly int height;
+    public int Height { get { return height + 2; } }
     readonly List<CellInfo> cells;
 
     public Map(int width, int height) {
-        Width = width;
-        Height = height;
+        this.width = width;
+        this.height = height;
         cells = new List<CellInfo>();
         Initialize();
     }
@@ -21,8 +23,8 @@ public class Map {
         }
     }
     private void Initialize() {
-        for(int i = 0; i < Width + 2; i++) {
-            for(int j = 0; j < Height + 2; j++) {
+        for(int i = 0; i < Width; i++) {
+            for(int j = 0; j < Height; j++) {
                 var cellInfo = new CellInfo(i, j, UnitType.Empty);
                 cells.Add(cellInfo);
             }
@@ -36,6 +38,25 @@ public class Map {
     }
     public CellInfo[] GetCellsInsteadOf(params UnitType[] unitTypes) {
         return cells.Where(x => unitTypes.All(unitType => x.UnitType != unitType)).ToArray();
+    }
+
+    public CellInfo GetStaticCell(float x, float z) {
+        var foundCell = cells.Single(cell => cell.X == x && cell.Z == z);
+        return new CellInfo(foundCell.X, foundCell.Z, CoerceUnitType(foundCell.UnitType));
+    }
+
+    UnitType CoerceUnitType(UnitType unitType) {
+        switch(unitType) {
+            case UnitType.Enemy:
+            case UnitType.Stub:
+            case UnitType.WoodenWall:
+            case UnitType.Empty:
+                return UnitType.Empty;
+            case UnitType.Wall:
+                return UnitType.Wall;
+            default:
+                throw new NotSupportedException();
+        }
     }
 }
 public class CellInfo {
@@ -58,6 +79,8 @@ public enum UnitType {
     Empty
 }
 public class GameInitializer : MonoBehaviour {
+
+    public static Map Map;
 
     public GameObject floor;
     public GameObject wall;
@@ -82,10 +105,9 @@ public class GameInitializer : MonoBehaviour {
     public int MapHeight = 7;
 
     void Start() {
-        Instantiate(ObjectLoader.GetObject("Models/Directional Light")); 
+        Instantiate(ObjectLoader.GetObject("Models/Directional Light"));
         GenerateMap(MapWidth, MapHeight, 3);
     }
-
     void OnGUI() {
         GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score);
     }
@@ -104,53 +126,62 @@ public class GameInitializer : MonoBehaviour {
         floor.transform.position = new Vector3(-(width + 1f) / 2, -0.5f, (height + 1f) / 2) * BlockSize;
         Instantiate(floor);
 
-        var map = new Map(width, height);
-        map.ChangeCellUnitType(1, 1, UnitType.Stub);
-        map.ChangeCellUnitType(1, 2, UnitType.Stub);
-        map.ChangeCellUnitType(2, 1, UnitType.Stub);
+        Map = new Map(width, height);
+        Map.ChangeCellUnitType(1, 1, UnitType.Stub);
+        Map.ChangeCellUnitType(1, 2, UnitType.Stub);
+        Map.ChangeCellUnitType(2, 1, UnitType.Stub);
         // map boder
         for(int i = 1; i < width + 1; i++) {
-            map.ChangeCellUnitType(i, 0, UnitType.Wall);
-            map.ChangeCellUnitType(i, height + 1, UnitType.Wall);
+            Map.ChangeCellUnitType(i, 0, UnitType.Wall);
+            Map.ChangeCellUnitType(i, height + 1, UnitType.Wall);
         }
         for(int i = 0; i < height + 2; i++) {
-            map.ChangeCellUnitType(0, i, UnitType.Wall);
-            map.ChangeCellUnitType(width + 1, i, UnitType.Wall);
+            Map.ChangeCellUnitType(0, i, UnitType.Wall);
+            Map.ChangeCellUnitType(width + 1, i, UnitType.Wall);
         }
         // wall blocks
         for(int i = 1; i < width + 1; i++) {
             for(int j = 1; j < height + 1; j++) {
                 if((i & 1) == 0 && (j & 1) == 0) {
-                    map.ChangeCellUnitType(i, j, UnitType.Wall);
+                    Map.ChangeCellUnitType(i, j, UnitType.Wall);
                 }
             }
         }
         GameController.Enemy = enemyCount;
         var random = new System.Random();
+        ////// TODO: REMOVE THIS SHIT
+        int x1 = 0;
+        int y1 = 0;
+        ////// TODO: REMOVE THIS SHIT
         while(enemyCount > 0) {
             var x = random.Next(1, width + 1);
             var z = random.Next(1, height + 1);
 
-            if(map.CellIsEmpty(x, z)) {
-                map.ChangeCellUnitType(x, z, UnitType.Enemy);
+            if(Map.CellIsEmpty(x, z)) {
+                Map.ChangeCellUnitType(x, z, UnitType.Enemy);
+                x1 = x;
+                y1 = z;
                 enemyCount--;
             }
         }
 
         for(int i = 1; i < width + 1; i++) {
             for(int j = 1; j < height + 1; j++) {
-                if((Random.Range(0f, 1f) <= 0.25f) && (map.CellIsEmpty(i, j))){
-                    map.ChangeCellUnitType(i, j, UnitType.WoodenWall);                 
+                if((Random.Range(0f, 1f) <= 0.25f) && (Map.CellIsEmpty(i, j))) {
+                    Map.ChangeCellUnitType(i, j, UnitType.WoodenWall);
                 }
             }
         }
-        GameController.WWall = map[UnitType.WoodenWall].Length;
+        GameController.WWall = Map[UnitType.WoodenWall].Length;
 
-        foreach(var cellInfo in map.GetCellsInsteadOf(UnitType.Empty, UnitType.Stub)) {          
-                var obj = GetObject(cellInfo.UnitType);
-                obj.transform.position = new Vector3(-cellInfo.X, 0, cellInfo.Z) * BlockSize;
-                Instantiate(obj);           
-        } 
+        PathFinder.InitializeNodeArray();
+        var s = PathFinder.FindPath(new Vector3(x1, 0, y1), new Vector3(1, 0, 1));
+
+        foreach(var cellInfo in Map.GetCellsInsteadOf(UnitType.Empty, UnitType.Stub)) {
+            var obj = GetObject(cellInfo.UnitType);
+            obj.transform.position = new Vector3(-cellInfo.X, 0, cellInfo.Z) * BlockSize;
+            Instantiate(obj);
+        }
         Instantiate(player);
     }
     GameObject GetObject(UnitType unitType) {
