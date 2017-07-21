@@ -25,10 +25,11 @@ public class GameInitializer : MonoBehaviour {
     //    }
     //}
     public int BlockSize = 5;
-    public int MapWidth = 9;
-    public int MapHeight = 9;
+    public int MapWidth = 7;
+    public int MapHeight = 7;
 
     void Start() {
+        Instantiate(ObjectLoader.GetObject("Models/Directional Light")); 
         GenerateMap(MapWidth, MapHeight, 3);
     }
 
@@ -41,24 +42,29 @@ public class GameInitializer : MonoBehaviour {
         Wall,
         WoodenWall,
         Enemy,
-        Stub
+        Stub,
+        Empty
     }
     struct CellInfo {
-        public CellInfo(float x, float y, float z, UnitType unitType) {
+        public CellInfo(float x, float z, UnitType unitType) {
             X = x;
-            Y = y;
             Z = z;
             UnitType = unitType;
         }
 
         public float X;
-        public float Y;
         public float Z;
         public UnitType UnitType;
     }
     class Map : List<CellInfo> {
-        public bool CellIsEmpty(float x, float y, float z) {
-            return !this.Any(cellInfo => cellInfo.X == x && cellInfo.Y == y && cellInfo.Z == z);
+        public CellInfo[] this[UnitType unitType] {
+            get {
+                return this.Where(x => x.UnitType == unitType).ToArray();
+            }
+        }
+
+        public bool CellIsEmpty(float x, float z) {
+            return !this.Any(cellInfo => cellInfo.X == x && cellInfo.Z == z);
         }
     }
 
@@ -73,33 +79,33 @@ public class GameInitializer : MonoBehaviour {
         enemy1 = ObjectLoader.GetObject("Models/Enemy1");
         enemy2 = ObjectLoader.GetObject("Models/Enemy2");
 
-        floor.transform.localScale = new Vector3(width + 1.5f, 1f, height + 1.5f);
-        floor.transform.position = new Vector3(-(width + 1f) * BlockSize, -(BlockSize / 2f), (height + 1) * BlockSize);
+        floor.transform.localScale = new Vector3((width / 2) + 1.5f, 1f, (height / 2) + 1.5f);
+        floor.transform.position = new Vector3(-(width + 1f) / 2, -0.5f, (height + 1f) / 2) * BlockSize;
         Instantiate(floor);
 
         var map = new Map();
 
-        map.Add(new CellInfo(-1, 0, 1, UnitType.Stub));
-        map.Add(new CellInfo(-1, 0, 2, UnitType.Stub));
-        map.Add(new CellInfo(-2, 0, 1, UnitType.Stub));
+        map.Add(new CellInfo(-1, 1, UnitType.Stub));
+        map.Add(new CellInfo(-1, 2, UnitType.Stub));
+        map.Add(new CellInfo(-2, 1, UnitType.Stub));
         // map boder
         for(int i = 0; i < height + 2; i++) {
-            var cellInfo = new CellInfo(0, 0, i, UnitType.Wall);
+            var cellInfo = new CellInfo(0, i, UnitType.Wall);
             map.Add(cellInfo);
-            cellInfo = new CellInfo(-(width + 1), 0, i, UnitType.Wall);
+            cellInfo = new CellInfo(-(width + 1), i, UnitType.Wall);
             map.Add(cellInfo);
         }
         for(int i = 1; i < width + 1; i++) {
-            var cellInfo = new CellInfo(-i, 0, 0, UnitType.Wall);
+            var cellInfo = new CellInfo(-i, 0, UnitType.Wall);
             map.Add(cellInfo);
-            cellInfo = new CellInfo(-i, 0, height + 1, UnitType.Wall);
+            cellInfo = new CellInfo(-i, height + 1, UnitType.Wall);
             map.Add(cellInfo);
         }
         // wall blocks
         for(int i = 1; i < height + 1; i++) {
             for(int j = 1; j < width + 1; j++) {
                 if((i & 1) == 0 && (j & 1) == 0) {
-                    var cellInfo = new CellInfo(-j, 0, i, UnitType.Wall);
+                    var cellInfo = new CellInfo(-j, i, UnitType.Wall);
                     map.Add(cellInfo);
                 }
             }
@@ -110,16 +116,26 @@ public class GameInitializer : MonoBehaviour {
             var x = random.Next(1, width + 1);
             var z = random.Next(1, height + 1);
 
-            if(map.CellIsEmpty(-x, 0, z)) {
-                var cellInfo = new CellInfo(-x, 0, z, UnitType.Enemy);
+            if(map.CellIsEmpty(-x, z)) {
+                var cellInfo = new CellInfo(-x, z, UnitType.Enemy);
                 map.Add(cellInfo);
                 enemyCount--;
             }
         }
 
+        for(int i = 1; i < height + 1; i++) {
+            for(int j = 1; j < width + 1; j++) {
+                if((Random.Range(0f, 1f) <= 0.25f) && (map.CellIsEmpty(-j, i))){
+                    var cellInfo = new CellInfo(-j, i, UnitType.WoodenWall);
+                    map.Add(cellInfo);
+                    GameController.WWall++;
+                }
+            }
+        }
+        
         foreach(var cellInfo in map.Where(x => x.UnitType != UnitType.Stub)) {          
                 var obj = GetObject(cellInfo.UnitType);
-                obj.transform.position = new Vector3(cellInfo.X, cellInfo.Y, cellInfo.Z) * BlockSize;
+                obj.transform.position = new Vector3(cellInfo.X, 0, cellInfo.Z) * BlockSize;
                 Instantiate(obj);           
         } 
         Instantiate(player);
@@ -130,18 +146,10 @@ public class GameInitializer : MonoBehaviour {
                 return wall;
             case UnitType.Enemy:
                 return enemy1;
+            case UnitType.WoodenWall:
+                return wWall;
             default:
                 throw new NotSupportedException();
         }
-    }
-
-    void GenerateWWall(int width, int height) {
-        for(int i = BlockSize; i < (width * 2 + 2) * BlockSize; i += BlockSize)
-            for(int j = BlockSize; j < (height * 2 + 2) * BlockSize; j += BlockSize) {
-                if(Random.Range(0f, 1f) <= 0.25f) {
-                    wWall.transform.position = new Vector3(-i, 0, j);
-                    Instantiate(wWall);
-                }
-            }
     }
 }

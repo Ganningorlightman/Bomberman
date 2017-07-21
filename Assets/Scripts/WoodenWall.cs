@@ -47,7 +47,6 @@ public class WoodenWall : MonoBehaviour {
     public string ChooseBonus()
     {
         rand = Random.Range(0, GameController.BonusPower);
-
         switch (rand)
         {
             case 0: return "Bombs";               
@@ -57,7 +56,6 @@ public class WoodenWall : MonoBehaviour {
             case 4: return "Detonator";
             case 5: return "BombPass";
             case 6: return "FlamePass";
-
             default: return "Flames";
         }
     }

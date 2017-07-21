@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
@@ -31,8 +32,15 @@ public class PlayerController : MonoBehaviour {
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
-        ani = GetComponent<Animator>();       
-    }
+        ani = GetComponent<Animator>();
+        moveSpeed = PlayerCharacteristics.MoveSpeed;
+        Bombs = PlayerCharacteristics.Bombs;
+        Flames = PlayerCharacteristics.Flames;
+        Wallpass = PlayerCharacteristics.WallPass;
+        Bombpass =  PlayerCharacteristics.BombPass;
+        Flamepass = PlayerCharacteristics.FlamePass;
+        Detonator = PlayerCharacteristics.Detonator;
+}
 
     void Update()
     {
@@ -137,7 +145,6 @@ public class PlayerController : MonoBehaviour {
         Destroy(gameObject, 4f);
         GetComponent<Collider>().enabled = false;
         print("Defeat");
-        print(GameController.Score);
     }
   
     public void OnTriggerEnter(Collider col)
@@ -197,7 +204,15 @@ public class PlayerController : MonoBehaviour {
         if ((col.CompareTag("Exit")) && (GameController.ExitOpen))
         {
             print("Win");
-            print(GameController.Score);
+            PlayerCharacteristics.MoveSpeed = (int)moveSpeed;
+            PlayerCharacteristics.Bombs = Bombs;
+            PlayerCharacteristics.Flames = Flames;
+            PlayerCharacteristics.WallPass = Wallpass;
+            PlayerCharacteristics.BombPass = Bombpass;
+            PlayerCharacteristics.FlamePass = Flamepass;
+            PlayerCharacteristics.Detonator = Detonator;
+            GameController.ExitCreated = false;
+            SceneManager.LoadScene("Scene", LoadSceneMode.Single);
         }
     }
 
