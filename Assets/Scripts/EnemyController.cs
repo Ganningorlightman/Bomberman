@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour {
     public float speed;
     public bool Wallpass;
     public int points;
+    public int Smart;
     private bool dead = false;
 
     void Start()
@@ -27,57 +28,52 @@ public class EnemyController : MonoBehaviour {
     {
         if (!dead)
         {
-            if (myTime <= 0)
-            {
-                direc = Random.Range(1, 5);
-                myTime = 1.5f;
-            }
-            else myTime -= Time.deltaTime;
-
-            switch (direc)
-            {
-                case 1:
-                    { //В верх
-                        rigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
-                        break;
-                    }
-                case 2:
-                    { //В низ       
-                        rigidBody.transform.rotation = new Quaternion(0, 90, 0, 0);
-                        break;
-                    }
-                case 3:
-                    { //на право
-                        rigidBody.transform.rotation = new Quaternion(0, -90, 0, 90);
-                        break;
-                    }
-                case 4:
-                    { //на лево
-                        rigidBody.transform.rotation = new Quaternion(0, 90, 0, 90);
-                        break;
-                    }
-            }
-            Move();
+            RandomDirection();
         }
     }
 
+    private void RandomDirection() {
+        if(myTime <= 0) {
+            direc = Random.Range(1, 5);
+            myTime = 1.5f;
+        } else myTime -= Time.deltaTime;
+
+        switch(direc) {
+            case 1: { //В верх
+                    rigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
+                    break;
+                }
+            case 2: { //В низ       
+                    rigidBody.transform.rotation = new Quaternion(0, 90, 0, 0);
+                    break;
+                }
+            case 3: { //на право
+                    rigidBody.transform.rotation = new Quaternion(0, -90, 0, 90);
+                    break;
+                }
+            case 4: { //на лево
+                    rigidBody.transform.rotation = new Quaternion(0, 90, 0, 90);
+                    break;
+                }
+        }
+        Move();
+    }
     private void Move()
     {
-        if (CheckLayers())
+        if (CheckLayers(transform.position))
             transform.position += transform.forward * speed * Time.deltaTime;
         else myTime = 0;
     }
-
-    private bool CheckLayers()
+    private bool CheckLayers(Vector3 position)
     {
         RaycastHit hit;
-        Vector3 p1 = transform.position + charContr.center;
+        Vector3 p1 = position + charContr.center;
 
-        if ((!Physics.SphereCast(p1, charContr.height / 2, transform.forward, out hit, 2.5f, wallLayer)) && (!Physics.SphereCast(p1, charContr.height / 2, transform.forward, out hit, 2.5f, bombLayer)) && Wallpass)
+        if ((!Physics.SphereCast(p1, charContr.height, transform.forward, out hit, 1.5f, wallLayer)) && (!Physics.SphereCast(p1, charContr.height, transform.forward, out hit, 1.5f, bombLayer)) && Wallpass)
         {
             return true;
         }
-        else if ((!Physics.SphereCast(p1, charContr.height / 2, transform.forward, out hit, 2.5f, wallLayer)) && (!Physics.SphereCast(p1, charContr.height / 2, transform.forward, out hit, 2.5f, bombLayer)) && (!Physics.SphereCast(p1, charContr.height / 2, transform.forward, out hit, 2.5f, wWallLayer)) && !Wallpass)
+        else if ((!Physics.SphereCast(p1, charContr.height, transform.forward, out hit, 1.5f, wallLayer)) && (!Physics.SphereCast(p1, charContr.height, transform.forward, out hit, 1.5f, bombLayer)) && (!Physics.SphereCast(p1, charContr.height, transform.forward, out hit, 1.5f, wWallLayer)) && !Wallpass)
         {
             return true;
         }

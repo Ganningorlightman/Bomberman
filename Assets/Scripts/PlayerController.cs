@@ -27,8 +27,7 @@ public class PlayerController : MonoBehaviour {
     public bool Detonator;
     private bool dead = false;
 
-    void Start()
-    {
+    void Start() {
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
@@ -37,10 +36,10 @@ public class PlayerController : MonoBehaviour {
         Bombs = PlayerCharacteristics.Bombs;
         Flames = PlayerCharacteristics.Flames;
         Wallpass = PlayerCharacteristics.WallPass;
-        Bombpass =  PlayerCharacteristics.BombPass;
+        Bombpass = PlayerCharacteristics.BombPass;
         Flamepass = PlayerCharacteristics.FlamePass;
         Detonator = PlayerCharacteristics.Detonator;
-}
+    }
 
     void Update()
     {
