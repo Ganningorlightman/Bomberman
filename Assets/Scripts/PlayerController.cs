@@ -25,9 +25,11 @@ public class PlayerController : MonoBehaviour {
     public bool Bombpass;
     public bool Flamepass;
     public bool Detonator;
-    private bool dead = false;
+    public bool Death { get; set; }
+    public Vector3 PlayerPosition { get { return Rounding(myTransform.position.x, myTransform.position.z); } }
 
     void Start() {
+        Death = false;
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
         charContr = GetComponent<CharacterController>();
@@ -38,12 +40,12 @@ public class PlayerController : MonoBehaviour {
         Wallpass = PlayerCharacteristics.WallPass;
         Bombpass = PlayerCharacteristics.BombPass;
         Flamepass = PlayerCharacteristics.FlamePass;
-        Detonator = PlayerCharacteristics.Detonator;
+        Detonator = PlayerCharacteristics.Detonator; 
     }
 
     void Update()
     {
-        if (!dead)
+        if (!Death)
         {
             PlayerMovement();
             
@@ -53,42 +55,45 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void PlayerMovement()
-    {       
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-        { //В верх          
-            myTransform.rotation = new Quaternion(0, 0, 0, 0);
+    {
+        if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) { //Вверх          
+            myTransform.rotation = Quaternion.Euler(0, 0, 0);
             Move();
-        }
-        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-        { //В низ    
-            myTransform.rotation = new Quaternion(0, 90, 0, 0);
+        } else if(Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) { //Вниз    
+            myTransform.rotation = Quaternion.Euler(0, 180, 0);
             Move();
-        }
-        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-        { //на право
-            myTransform.rotation = new Quaternion(0, -90, 0, 90);
+        } else if(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) { //направо
+            myTransform.rotation = Quaternion.Euler(0, 90, 0);
             Move();
-        }
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        { //на лево
-            myTransform.rotation = new Quaternion(0, 90, 0, 90);
+        } else if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) { //налево
+            myTransform.rotation = Quaternion.Euler(0, 270, 0);
             Move();
-        }
-        else ani.SetBool("Speed", false);
-
+        } else ani.SetBool("Speed", false);
     }
 
     private void Move()
     {
-        if (CheckLayers())        
+        if(CheckLayers()) {
             rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+        }
             ani.SetBool("Speed", true);           
     }
-
+    private Vector3 Rounding(float x, float z) {
+        x = Mathf.RoundToInt(x);
+        z = Mathf.RoundToInt(z);
+        var Size = GameInitializer.BlockSize;
+        if((Mathf.Abs(x) % Size) >= (int)(Size / 2))
+            x = x - (x % Size) - Size;
+        else x = x - (x % Size);
+        if((Mathf.Abs(z) % Size) >= (int)(Size / 2))
+            z = z - (z % Size) + Size;
+        else z = z - (z % Size);
+        return new Vector3(x, 0f, z);
+    }
     private bool CheckLayers()
     {
         RaycastHit hit;
-        Vector3 p1 = transform.position + charContr.center + Vector3.up * -charContr.height * 0.5F;
+        Vector3 p1 = myTransform.position + charContr.center + Vector3.up * -charContr.height * 0.5F;
         Vector3 p2 = p1 + Vector3.up * charContr.height;
 
         if ((!Physics.CapsuleCast(p1, p2, charContr.radius, transform.forward, out hit, distlLenght, wallLayer)) && Wallpass && Bombpass)
@@ -112,23 +117,12 @@ public class PlayerController : MonoBehaviour {
             return false;
         }
     }
-
     private void DropBomb()
     {
-
         if (BombsCounter < Bombs) {
-            BombsCounter++;
-            var BombSize = 5;
-            bomb = ObjectLoader.GetObject("Models/Bomb");
-            float x = Mathf.RoundToInt(myTransform.position.x);
-            float z = Mathf.RoundToInt(myTransform.position.z);          
-            if ((Mathf.Abs(x) % BombSize) >= (int)(BombSize / 2))
-                x = x - (x % BombSize) - BombSize;
-            else x = x - (x % BombSize);
-            if ((Mathf.Abs(z) % BombSize) >= (int)(BombSize / 2))
-                z = z - (z % BombSize) + BombSize;
-            else z = z - (z % BombSize);
-            bomb.transform.position = new Vector3(x, 0f, z);          
+            BombsCounter++;            
+            bomb = ObjectLoader.GetObject("Models/Bomb");           
+            bomb.transform.position = Rounding(myTransform.position.x, myTransform.position.z);          
             ani.SetTrigger("Plant");
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();
@@ -139,21 +133,20 @@ public class PlayerController : MonoBehaviour {
     }
     private void Dead()
     {
-        dead = true;
+        Death = true;
         ani.SetTrigger("Death");
-        Destroy(gameObject, 4f);
         GetComponent<Collider>().enabled = false;
         print("Defeat");
+        Destroy(gameObject, 4f);       
     }
-  
     public void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Enemy") && (!dead))
+        if (col.CompareTag("Enemy") && (!Death))
         {
             Dead();
         }
 
-        if (col.CompareTag("Explosion") && (!Flamepass) && (!dead))
+        if (col.CompareTag("Explosion") && (!Flamepass) && (!Death))
         {
             Dead();
         }

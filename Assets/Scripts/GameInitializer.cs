@@ -3,81 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using System.Linq;
-public class Map {
-
-    readonly int width;
-    public int Width { get { return width + 2; } }
-    readonly int height;
-    public int Height { get { return height + 2; } }
-    readonly List<CellInfo> cells;
-
-    public Map(int width, int height) {
-        this.width = width;
-        this.height = height;
-        cells = new List<CellInfo>();
-        Initialize();
-    }
-    public CellInfo[] this[UnitType unitType] {
-        get {
-            return cells.Where(x => x.UnitType == unitType).ToArray();
-        }
-    }
-    private void Initialize() {
-        for(int i = 0; i < Width; i++) {
-            for(int j = 0; j < Height; j++) {
-                var cellInfo = new CellInfo(i, j, UnitType.Empty);
-                cells.Add(cellInfo);
-            }
-        }
-    }
-    public void ChangeCellUnitType(float x, float z, UnitType unitType) {
-        cells.Single(cellInfo => cellInfo.X == x && cellInfo.Z == z).UnitType = unitType;
-    }
-    public bool CellIsEmpty(float x, float z) {
-        return cells.Single(cellInfo => cellInfo.X == x && cellInfo.Z == z).UnitType == UnitType.Empty;
-    }
-    public CellInfo[] GetCellsInsteadOf(params UnitType[] unitTypes) {
-        return cells.Where(x => unitTypes.All(unitType => x.UnitType != unitType)).ToArray();
-    }
-
-    public CellInfo GetStaticCell(float x, float z) {
-        var foundCell = cells.Single(cell => cell.X == x && cell.Z == z);
-        return new CellInfo(foundCell.X, foundCell.Z, CoerceUnitType(foundCell.UnitType));
-    }
-
-    UnitType CoerceUnitType(UnitType unitType) {
-        switch(unitType) {
-            case UnitType.Enemy:
-            case UnitType.Stub:
-            case UnitType.WoodenWall:
-            case UnitType.Empty:
-                return UnitType.Empty;
-            case UnitType.Wall:
-                return UnitType.Wall;
-            default:
-                throw new NotSupportedException();
-        }
-    }
-}
-public class CellInfo {
-    public CellInfo(float x, float z, UnitType unitType) {
-        X = x;
-        Z = z;
-        UnitType = unitType;
-    }
-
-    public float X;
-    public float Z;
-    public UnitType UnitType;
-}
-public enum UnitType {
-    Floor,
-    Wall,
-    WoodenWall,
-    Enemy,
-    Stub,
-    Empty
-}
 public class GameInitializer : MonoBehaviour {
 
     public static Map Map;
@@ -88,19 +13,8 @@ public class GameInitializer : MonoBehaviour {
     public GameObject player;
     public GameObject enemy1;
     public GameObject enemy2;
-    //int blockSize = 5;
-    //public int BlockSize {
-    //    get { return blockSize; }
-    //    set {
-    //        floor.gameObject.transform.localScale = new Vector3(value, value, value);
-    //        wall.gameObject.transform.localScale = new Vector3(value, value, value);
-    //        wWall.gameObject.transform.localScale = new Vector3(value, value, value);
-    //        enemy1.gameObject.transform.localScale = new Vector3(value, value, value);
-    //        enemy2.gameObject.transform.localScale = new Vector3(value, value, value);
-    //        blockSize = value;
-    //    }
-    //}
-    public int BlockSize = 5;
+
+    public static int BlockSize = 5;
     public int MapWidth = 7;
     public int MapHeight = 7;
 
@@ -149,18 +63,12 @@ public class GameInitializer : MonoBehaviour {
         }
         GameController.Enemy = enemyCount;
         var random = new System.Random();
-        ////// TODO: REMOVE THIS SHIT
-        int x1 = 0;
-        int y1 = 0;
-        ////// TODO: REMOVE THIS SHIT
         while(enemyCount > 0) {
             var x = random.Next(1, width + 1);
             var z = random.Next(1, height + 1);
 
             if(Map.CellIsEmpty(x, z)) {
                 Map.ChangeCellUnitType(x, z, UnitType.Enemy);
-                x1 = x;
-                y1 = z;
                 enemyCount--;
             }
         }
@@ -173,9 +81,6 @@ public class GameInitializer : MonoBehaviour {
             }
         }
         GameController.WWall = Map[UnitType.WoodenWall].Length;
-
-        PathFinder.InitializeNodeArray();
-        var s = PathFinder.FindPath(new Vector3(x1, 0, y1), new Vector3(1, 0, 1));
 
         foreach(var cellInfo in Map.GetCellsInsteadOf(UnitType.Empty, UnitType.Stub)) {
             var obj = GetObject(cellInfo.UnitType);

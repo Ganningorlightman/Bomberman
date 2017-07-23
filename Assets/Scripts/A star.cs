@@ -85,17 +85,13 @@ public interface IHeapItem : IComparable {
 }
 
 public class Node : CellInfo, IHeapItem {
-    public Node(int gridX, int gridY, UnitType unitType) : base(gridX, gridY, unitType) {
-        GridX = gridX;
-        GridY = gridY;
+    public Node(int x, int y, UnitType unitType) : base(x, y, unitType) {
         GCost = 0;
         HCost = 0;
     }
 
     int heapIndex;
 
-    public readonly int GridX;
-    public readonly int GridY;
     public int GCost;
     public int HCost;
     public Node Parent;
@@ -150,11 +146,11 @@ public class PathFinder {
         LinkedList<Node> neighbours = new LinkedList<Node>();
         for(int i = -1; i < 2; i++) {
             for(int j = -1; j < 2; j++) {
-                if(i == 0 && j == 0)
+                if(Mathf.Abs(i) == Mathf.Abs(j))
                     continue;
 
-                int checkX = node.GridX + i;
-                int checkY = node.GridY + j;
+                int checkX = (int)node.X + i;
+                int checkY = (int)node.Z + j;
 
                 if(checkX >= 0 && checkX < GameInitializer.Map.Width / XPixels && checkY >= 0 && checkY < GameInitializer.Map.Height / YPixels) {
                     var foundNode = NodeArray[checkX][checkY];
@@ -172,7 +168,7 @@ public class PathFinder {
         return new Stack<Node>(FindPathCore(start, targer));
     }
 
-    public static Node[] FindPathCore(Vector3 start, Vector3 targer) {
+    private static Node[] FindPathCore(Vector3 start, Vector3 targer) {
         Node startNode = NodeArray[(int)(start.x / XPixels)][(int)(start.z / YPixels)];
         Node targetNode = NodeArray[(int)(targer.x / XPixels)][(int)(targer.z / YPixels)];
 
@@ -190,7 +186,7 @@ public class PathFinder {
                     path.AddLast(targetNode);
                     targetNode = targetNode.Parent;
                 }
-                return path.Reverse().ToArray();
+                return path.ToArray();
             }
 
             foreach(var neighbour in GetNeighbours(currentNode)) {
@@ -209,12 +205,12 @@ public class PathFinder {
                 }
             }
         }
-        return null;
+        return new Node[0];
     }
 
     public static int GetDistance(Node node1, Node node2) {
-        int dstX = Math.Abs(node1.GridX - node2.GridX);
-        int dstY = Math.Abs(node1.GridY - node2.GridY);
+        int dstX = (int)Math.Abs(node1.X - node2.X);
+        int dstY = (int)Math.Abs(node1.Z - node2.Z);
         if(dstX > dstY)
             return 14 * dstY + 10 * (dstX - dstY);
         return 14 * dstX + 10 * (dstY - dstX);
