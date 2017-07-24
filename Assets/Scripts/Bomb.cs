@@ -13,6 +13,7 @@ public class Bomb : MonoBehaviour {
     private bool destroy = false;
     public AudioSource ExpAudio;
     public float BombSize = 5;
+    private GameInitializer gameIni;
 
     Action callback;
     void Start()
@@ -42,6 +43,10 @@ public class Bomb : MonoBehaviour {
         StartCoroutine(CreateExplosion(Vector3.right));
         StartCoroutine(CreateExplosion(Vector3.left));
         ExpAudio.Play();
+        gameIni = GameObject.FindObjectOfType<GameInitializer>();
+        Vector3 old = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        old = Transformation(old);
+        gameIni.Map.ChangeCellUnitType(old.x, old.z, UnitType.Empty);
         Destroy(gameObject, 0.5f);
         if (callback != null)
             callback();
@@ -75,5 +80,8 @@ public class Bomb : MonoBehaviour {
             CancelInvoke("Explode");
             Explode();
         }
+    }
+    private Vector3 Transformation(Vector3 old) {
+        return new Vector3(Mathf.CeilToInt(-old.x / GameInitializer.BlockSize), 0, Mathf.CeilToInt(old.z / GameInitializer.BlockSize));
     }
 }

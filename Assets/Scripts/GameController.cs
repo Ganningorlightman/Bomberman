@@ -10,6 +10,7 @@ public static class GameController {
     public static int WWall = 0;
     public static int BonusesOnLevel = 2;
     public static int BonusPower = 2;
+    public static int Level = 0;
     public static bool ExitCreated = false;
 }
 public static class PlayerCharacteristics {

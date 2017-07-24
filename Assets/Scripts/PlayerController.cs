@@ -81,6 +81,9 @@ public class PlayerController : MonoBehaviour {
         }
             ani.SetBool("Speed", true);           
     }
+    private Vector3 Transformation(Vector3 old) {
+        return new Vector3(Mathf.CeilToInt(-old.x / GameInitializer.BlockSize), 0, Mathf.CeilToInt(old.z / GameInitializer.BlockSize));
+    }
     private Vector3 Rounding(float x, float z) {
         x = Mathf.RoundToInt(x);
         z = Mathf.RoundToInt(z);
@@ -125,7 +128,11 @@ public class PlayerController : MonoBehaviour {
         if (BombsCounter < Bombs) {
             BombsCounter++;            
             bomb = ObjectLoader.GetObject("Models/Bomb");           
-            bomb.transform.position = Rounding(myTransform.position.x, myTransform.position.z);          
+            bomb.transform.position = Rounding(myTransform.position.x, myTransform.position.z);
+            gameIni = GameObject.FindObjectOfType<GameInitializer>();
+            Vector3 old = new Vector3(bomb.transform.position.x, bomb.transform.position.y, bomb.transform.position.z);
+            old = Transformation(old);
+            gameIni.Map.ChangeCellUnitType(old.x, old.z, UnitType.Bomb);
             ani.SetTrigger("Plant");
             var bombObject = Instantiate(bomb);
             Bomb bombBehavior = bombObject.GetComponent<Bomb>();
@@ -207,6 +214,7 @@ public class PlayerController : MonoBehaviour {
             PlayerCharacteristics.FlamePass = Flamepass;
             PlayerCharacteristics.Detonator = Detonator;
             GameController.ExitCreated = false;
+            GameController.Level += 1;
             SceneManager.LoadScene("Scene", LoadSceneMode.Single);
         }
     }

@@ -54,7 +54,8 @@ public class EnemyController : MonoBehaviour {
         start = Transformation(new Vector3(-Rounding(transform.position.x, lastPosition.x), 0, Rounding(transform.position.z, lastPosition.z)));
         end = Transformation(RoundingEnd(playerContr.PlayerPosition.x, playerContr.PlayerPosition.z));
         var path = pathFinder.FindPath(start, end);
-        if(path.Any()) {
+        temp = new Vector3(Mathf.Abs(start.x - end.x), 0, Mathf.Abs(start.z - end.z));
+        if(path.Any() && (temp.x < 5) && (temp.z < 5)) {
             nextStep = path.Pop();
             temp = (Transformation(start) - Transformation(new Vector3(nextStep.X, 0f, nextStep.Z)));
             if((temp.x == 0) && (temp.z == 0)) {
@@ -72,6 +73,7 @@ public class EnemyController : MonoBehaviour {
             }
             Move();
         }
+        else RandomDirection();
     }
     private Vector3 Transformation(Vector3 old) {
         if(old.x < 0) {
@@ -108,7 +110,6 @@ public class EnemyController : MonoBehaviour {
         else z = z - (z % Size);
         return new Vector3(x, 0f, z);
     }
-
     private void RandomDirection() {
         if(myTime <= 0) {
             direc = Random.Range(1, 5);

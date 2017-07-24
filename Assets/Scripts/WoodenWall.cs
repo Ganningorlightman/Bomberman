@@ -7,6 +7,7 @@ public class WoodenWall : MonoBehaviour {
     private int rand;
     private bool destroy = false;
     private GameObject UnderObject;
+    private GameInitializer gameIni;
 
     public void OnTriggerEnter(Collider col)
     {
@@ -14,6 +15,10 @@ public class WoodenWall : MonoBehaviour {
         {
             destroy = true;
             Destroy(gameObject);
+            gameIni = GameObject.FindObjectOfType<GameInitializer>();
+            Vector3 old = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            old = Transformation(old);
+            gameIni.Map.ChangeCellUnitType(old.x, old.z, UnitType.Empty);
             GameController.WWall--;          
             if((GameController.WWall == 0) && (!GameController.ExitCreated))
             {
@@ -59,5 +64,7 @@ public class WoodenWall : MonoBehaviour {
             default: return "Flames";
         }
     }
-
+    private Vector3 Transformation(Vector3 old) {
+       return new Vector3(Mathf.CeilToInt(-old.x / GameInitializer.BlockSize), 0, Mathf.CeilToInt(old.z / GameInitializer.BlockSize));     
+    }
 }

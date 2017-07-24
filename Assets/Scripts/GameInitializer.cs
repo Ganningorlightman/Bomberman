@@ -16,19 +16,21 @@ public class GameInitializer : MonoBehaviour {
     public GameObject enemy3;
 
     public static int BlockSize = 5;
-    public int MapWidth = 7;
-    public int MapHeight = 7;
-    public Vector3 cameraPosition;   
+    public int MapWidth = 17;
+    public int MapHeight = 9;
+    public Vector3 cameraPosition;
+    public LevelGenerator levelGenerator;
 
     void Start() {
         Instantiate(ObjectLoader.GetObject("Models/Directional Light"));
-        GenerateMap(MapWidth, MapHeight, 3);
+        levelGenerator = new LevelGenerator(GameController.Level);
+        GenerateMap(MapWidth, MapHeight);
         cameraPosition = transform.position;
     }
     void OnGUI() {
-        GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score);
+        GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score + Environment.NewLine + "Level: " + (GameController.Level + 1));
     }
-    void GenerateMap(int width, int height, int enemyCount) {
+    void GenerateMap(int width, int height) {
         if((width & 1) == 0 || (height & 1) == 0) {
             throw new InvalidOperationException("Width or Height must be odd");
         }
@@ -64,6 +66,10 @@ public class GameInitializer : MonoBehaviour {
                     Map.ChangeCellUnitType(i, j, UnitType.Wall);
                 }
             }
+        }
+        int enemyCount = 0;
+        foreach(int i in levelGenerator.enemy) {
+            enemyCount += i;
         }
         GameController.Enemy = enemyCount;
         var random = new System.Random();
@@ -101,7 +107,16 @@ public class GameInitializer : MonoBehaviour {
             case UnitType.Wall:
                 return wall;
             case UnitType.Enemy:
-                return enemy1;
+                if(levelGenerator.enemy[0] > 0) {
+                    levelGenerator.enemy[0]--;
+                    return enemy1;
+                } else if(levelGenerator.enemy[1] > 0) {
+                    levelGenerator.enemy[1]--;
+                    return enemy2;
+                } else {
+                    levelGenerator.enemy[2]--;
+                    return enemy3;
+                }         
             case UnitType.WoodenWall:
                 return wWall;
             default:

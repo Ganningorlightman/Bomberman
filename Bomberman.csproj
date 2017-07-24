@@ -83,6 +83,7 @@
     <Compile Include="Assets\Scripts\Explosion.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
+    <Compile Include="Assets\Scripts\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\Map.cs" />
     <Compile Include="Assets\Scripts\ObjectLoader.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
