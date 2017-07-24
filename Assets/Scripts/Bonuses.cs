@@ -11,5 +11,4 @@ public enum Bonuses{
     Detonator,
     BombPass,
     FlamePass
-
 }

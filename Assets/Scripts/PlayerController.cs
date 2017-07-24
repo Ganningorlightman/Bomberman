@@ -214,7 +214,8 @@ public class PlayerController : MonoBehaviour {
             PlayerCharacteristics.FlamePass = Flamepass;
             PlayerCharacteristics.Detonator = Detonator;
             GameController.ExitCreated = false;
-            GameController.Level += 1;
+            GameController.Level++;
+            Destroy(col.gameObject);
             SceneManager.LoadScene("Scene", LoadSceneMode.Single);
         }
     }
