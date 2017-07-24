@@ -40,12 +40,13 @@ public class Map {
         return cells.Where(x => unitTypes.All(unitType => x.UnitType != unitType)).ToArray();
     }
 
-    public CellInfo GetStaticCell(float x, float z) {
+    public CellInfo GetStaticCell(float x, float z, bool wallPass) {
         var foundCell = cells.Single(cell => cell.X == x && cell.Z == z);
-        return new CellInfo(foundCell.X, foundCell.Z, CoerceUnitType(foundCell.UnitType));
+        return new CellInfo(foundCell.X, foundCell.Z, CoerceUnitType(foundCell.UnitType, wallPass));
     }
 
-    UnitType CoerceUnitType(UnitType unitType) {
+    UnitType CoerceUnitType(UnitType unitType, bool wallPass) {
+        if(!wallPass && UnitType.WoodenWall == unitType) return UnitType.Wall;
         switch(unitType) {
             case UnitType.Enemy:
             case UnitType.Stub:
@@ -53,6 +54,7 @@ public class Map {
             case UnitType.Empty:
                 return UnitType.Empty;
             case UnitType.Wall:
+            case UnitType.Bomb:
                 return UnitType.Wall;
             default:
                 throw new NotSupportedException();

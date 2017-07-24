@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour {
     public LayerMask wWallLayer;
     public LayerMask bombLayer;
     private PlayerController playerContr;
+    private GameInitializer gameIni;
 
     public float speed;
     public bool Wallpass;
@@ -25,6 +26,7 @@ public class EnemyController : MonoBehaviour {
 
     void Start() {
         playerContr = GameObject.FindObjectOfType<PlayerController>();
+        gameIni = GameObject.FindObjectOfType<GameInitializer>();
         rigidBody = GetComponent<Rigidbody>();
         charContr = GetComponent<CharacterController>();
         rigidBody.transform.rotation = Quaternion.Euler(0, 180, 0);
@@ -48,10 +50,10 @@ public class EnemyController : MonoBehaviour {
         Vector3 temp = new Vector3();
         Vector3 start = new Vector3();
         Vector3 end = new Vector3();
-        PathFinder.InitializeNodeArray();
+        var pathFinder = new PathFinder(gameIni.Map, Wallpass);
         start = Transformation(new Vector3(-Rounding(transform.position.x, lastPosition.x), 0, Rounding(transform.position.z, lastPosition.z)));
         end = Transformation(RoundingEnd(playerContr.PlayerPosition.x, playerContr.PlayerPosition.z));
-        var path = PathFinder.FindPath(start, end);
+        var path = pathFinder.FindPath(start, end);
         if(path.Any()) {
             nextStep = path.Pop();
             temp = (Transformation(start) - Transformation(new Vector3(nextStep.X, 0f, nextStep.Z)));

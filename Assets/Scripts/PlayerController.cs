@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
     private CharacterController charContr;
     private float distlLenght = 1.5f;
     private Animator ani;
+    private GameInitializer gameIni;
 
     public LayerMask wallLayer;
     public LayerMask wWallLayer;
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour {
         Death = false;
         rigidBody = GetComponent<Rigidbody>();
         myTransform = transform;
+        gameIni = GameObject.FindObjectOfType<GameInitializer>();
         charContr = GetComponent<CharacterController>();
         ani = GetComponent<Animator>();
         moveSpeed = PlayerCharacteristics.MoveSpeed;
@@ -75,6 +77,7 @@ public class PlayerController : MonoBehaviour {
     {
         if(CheckLayers()) {
             rigidBody.transform.position += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
+            gameIni.cameraPosition += rigidBody.transform.forward * moveSpeed * Time.deltaTime;
         }
             ani.SetBool("Speed", true);           
     }

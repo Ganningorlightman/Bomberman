@@ -129,20 +129,22 @@ public class Node : CellInfo, IHeapItem {
 }
 
 public class PathFinder {
-    public static int XPixels = 1;
-    public static int YPixels = 1;
 
-    static Node[][] NodeArray;
-    public static void InitializeNodeArray() {
-        NodeArray = new Node[GameInitializer.Map.Width / XPixels][];
-        for(int i = 0; i < GameInitializer.Map.Width / XPixels; i++) {
-            NodeArray[i] = new Node[GameInitializer.Map.Height / YPixels];
-            for(int j = 0; j < GameInitializer.Map.Height / YPixels; j++)
-                NodeArray[i][j] = new Node(i, j, GameInitializer.Map.GetStaticCell(i, j).UnitType);
+    readonly Node[][] nodeArray;
+    readonly int width;
+    readonly int height;
+    public PathFinder(Map map, bool wallPass) {
+        width = map.Width;
+        height = map.Height;
+        nodeArray = new Node[width][];
+        for(int i = 0; i < width; i++) {
+            nodeArray[i] = new Node[height];
+            for(int j = 0; j < height; j++)
+                nodeArray[i][j] = new Node(i, j, map.GetStaticCell(i, j, wallPass).UnitType);
         }
     }
 
-    public static LinkedList<Node> GetNeighbours(Node node) {
+    LinkedList<Node> GetNeighbours(Node node) {
         LinkedList<Node> neighbours = new LinkedList<Node>();
         for(int i = -1; i < 2; i++) {
             for(int j = -1; j < 2; j++) {
@@ -152,8 +154,8 @@ public class PathFinder {
                 int checkX = (int)node.X + i;
                 int checkY = (int)node.Z + j;
 
-                if(checkX >= 0 && checkX < GameInitializer.Map.Width / XPixels && checkY >= 0 && checkY < GameInitializer.Map.Height / YPixels) {
-                    var foundNode = NodeArray[checkX][checkY];
+                if(checkX >= 0 && checkX < width && checkY >= 0 && checkY < height) {
+                    var foundNode = nodeArray[checkX][checkY];
                     if(foundNode.UnitType != UnitType.Wall) {
                         neighbours.AddLast(foundNode);
                     }
@@ -164,15 +166,15 @@ public class PathFinder {
         return neighbours;
     }
 
-    public static Stack<Node> FindPath(Vector3 start, Vector3 targer) {
+    public Stack<Node> FindPath(Vector3 start, Vector3 targer) {
         return new Stack<Node>(FindPathCore(start, targer));
     }
 
-    private static Node[] FindPathCore(Vector3 start, Vector3 targer) {
-        Node startNode = NodeArray[(int)(start.x / XPixels)][(int)(start.z / YPixels)];
-        Node targetNode = NodeArray[(int)(targer.x / XPixels)][(int)(targer.z / YPixels)];
+    Node[] FindPathCore(Vector3 start, Vector3 targer) {
+        Node startNode = nodeArray[(int)(start.x)][(int)(start.z)];
+        Node targetNode = nodeArray[(int)(targer.x)][(int)(targer.z)];
 
-        Heap openSet = new Heap(GameInitializer.Map.Width * GameInitializer.Map.Height);
+        Heap openSet = new Heap(width * height);
         LinkedList<Node> closedSet = new LinkedList<Node>();
         openSet.Add(startNode);
 

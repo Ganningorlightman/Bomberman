@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 using System.Linq;
 public class GameInitializer : MonoBehaviour {
 
-    public static Map Map;
+    public Map Map;
 
     public GameObject floor;
     public GameObject wall;
@@ -13,14 +13,17 @@ public class GameInitializer : MonoBehaviour {
     public GameObject player;
     public GameObject enemy1;
     public GameObject enemy2;
+    public GameObject enemy3;
 
     public static int BlockSize = 5;
     public int MapWidth = 7;
     public int MapHeight = 7;
+    public Vector3 cameraPosition;   
 
     void Start() {
         Instantiate(ObjectLoader.GetObject("Models/Directional Light"));
         GenerateMap(MapWidth, MapHeight, 3);
+        cameraPosition = transform.position;
     }
     void OnGUI() {
         GUI.Label(new Rect(10, 10, 100, 100), "Score: " + GameController.Score);
@@ -35,6 +38,7 @@ public class GameInitializer : MonoBehaviour {
         player = ObjectLoader.GetObject("Models/Player1");
         enemy1 = ObjectLoader.GetObject("Models/Enemy1");
         enemy2 = ObjectLoader.GetObject("Models/Enemy2");
+        enemy3 = ObjectLoader.GetObject("Models/Enemy3");
 
         floor.transform.localScale = new Vector3((width / 2) + 1.5f, 1f, (height / 2) + 1.5f);
         floor.transform.position = new Vector3(-(width + 1f) / 2, -0.5f, (height + 1f) / 2) * BlockSize;
@@ -87,7 +91,10 @@ public class GameInitializer : MonoBehaviour {
             obj.transform.position = new Vector3(-cellInfo.X, 0, cellInfo.Z) * BlockSize;
             Instantiate(obj);
         }
-        Instantiate(player);
+        Instantiate(player);        
+    }
+    void LateUpdate() {
+        transform.position = cameraPosition;
     }
     GameObject GetObject(UnitType unitType) {
         switch(unitType) {
